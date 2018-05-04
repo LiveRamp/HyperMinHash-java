@@ -45,7 +45,7 @@ public class TestBetaMinHash {
     // This test succeeds up to 10 billion elements, but to keep build times sane it's kept at 1 bil.
     BetaMinHash sk = new BetaMinHash();
     int step = 10_000;
-    for (long i = 1; i <= 1_000_000_000; i++) {
+    for (long i = 1; i <= 100_000_000; i++) {
 
       sk.add((i + "").getBytes());
 
@@ -66,9 +66,9 @@ public class TestBetaMinHash {
     BetaMinHash sk1 = new BetaMinHash();
     BetaMinHash sk2 = new BetaMinHash();
 
-    Set<String> unique = new HashSet<>(3_500_000 * 3);
+    Set<String> unique = new HashSet<>(3_500_000);
 
-    for (int i = 1; i <= 2_500_000; i++) {
+    for (int i = 1; i <= 1_500_000; i++) {
       String str = randomStringWithLength(randPositiveInt() % 32);
       sk1.add(str.getBytes());
       unique.add(str);
@@ -88,7 +88,6 @@ public class TestBetaMinHash {
 
   @Test
   public void testIntersection() {
-    // TODO make this test have tighter bounds the bigger the expected similarity
     int iters = 20;
     int k = 1_000_000;
 
@@ -113,9 +112,8 @@ public class TestBetaMinHash {
       long result = BetaMinHash.intersection(sk1, sk2);
 
       double pctError = 100 * getError(result, expected);
-      System.out.println(String.format("Result: %d, expected: %d, pctError: %f", result, expected, pctError));
       assertTrue(String.format("Expected error ratio to be at most %s but found %f", 10, pctError),
-          pctError <= 10);
+          pctError <= 3);
     }
   }
 
@@ -130,7 +128,7 @@ public class TestBetaMinHash {
     }
 
     BetaMinHash bigSketch = new BetaMinHash();
-    long bigSetSize = 1_000_000_000;
+    long bigSetSize = 100_000_000;
     for (long i = 1; i <= bigSetSize; i++) {
       bigSketch.add((i + "").getBytes());
     }
@@ -155,7 +153,6 @@ public class TestBetaMinHash {
     long sketchSize = 10_000;
     // union size gets bigger, jaccard gets smaller
     for (int i = 0; i < 15; i++) {
-      System.out.println(String.format("intersection size: %d | sketch size: %d", intersectionSize, sketchSize));
       BetaMinHash sk1 = new BetaMinHash();
       BetaMinHash sk2 = new BetaMinHash();
       BetaMinHash sk3 = new BetaMinHash();
