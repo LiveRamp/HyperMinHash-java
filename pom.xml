@@ -5,8 +5,7 @@
 
   <artifactId>HyperMinHash-java</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
-
+  <packaging>jar</packaging>
   <parent>
     <groupId>com.liveramp</groupId>
     <artifactId>pom-common</artifactId>
@@ -53,6 +52,10 @@
       <id>liveramp-repositories</id>
       <name>Liveramp Repositories</name>
       <url>http://repository.liveramp.com/artifactory/liveramp-repositories</url>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
     </repository>
   </repositories>
 
