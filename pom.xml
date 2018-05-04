@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>HyperMinHash-java</artifactId>
-  <version>1.0</version>
+  <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <parent>
@@ -12,6 +12,13 @@
     <artifactId>pom-common</artifactId>
     <version>1.1-SNAPSHOT</version>
   </parent>
+
+  <scm>
+    <connection>scm:git:git@github.com:LiveRamp/HyperMinHash-java.git</connection>
+    <url>scm:git:git@github.com:LiveRamp/HyperMinHash-java.git</url>
+    <developerConnection>scm:git:git@github.com:LiveRamp/HyperMinHash-java.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
 
   <properties>
     <skip.tests>false</skip.tests>
@@ -28,6 +35,11 @@
       <groupId>com.adgear</groupId>
       <artifactId>metrohash</artifactId>
       <version>1.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
     </dependency>
   </dependencies>
 

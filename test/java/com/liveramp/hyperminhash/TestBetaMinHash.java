@@ -40,7 +40,6 @@ public class TestBetaMinHash {
     }
   }
 
-
   @Test
   public void testReallyLargeCardinality() {
     // This test succeeds up to 10 billion elements, but to keep build times sane it's kept at 1 bil.
