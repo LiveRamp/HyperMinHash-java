@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/LiveRamp/commons.svg?branch=master)](https://travis-ci.org/LiveRamp/commons)
+[![Build Status](https://travis-ci.org/LiveRamp/HyperMinHash-java.svg?branch=master)](https://travis-ci.org/LiveRamp/HyperMinHash-java)
 
 # HyperMinHash-java
 A Java implementation of the HyperMinHash algorithm, presented in [Yu and Weber](https://arxiv.org/pdf/1710.08436.pdf). HyperMinHash allows approximating cardinalities, intersections, and Jaccard indices of sets with very high accuracy, in loglog space, and in a streaming fashion. 
