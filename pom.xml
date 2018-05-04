@@ -14,6 +14,7 @@
   </parent>
 
   <properties>
+    <skip.tests>false</skip.tests>
     <hadoop.version>2.5.0</hadoop.version>
   </properties>
 
