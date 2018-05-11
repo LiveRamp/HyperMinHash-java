@@ -28,6 +28,7 @@ public class BetaMinHash {
   public final static int P = 14;
   public final static int NUM_REGISTERS = (int)Math.pow(2, P);
 
+
   // TODO add actual validation if necessary
   // Q + R must always be <= 16 since we're packing values into 16 bit registers
   public final static int Q = 6;

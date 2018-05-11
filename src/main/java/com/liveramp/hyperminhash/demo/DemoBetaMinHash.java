@@ -1,19 +1,47 @@
 package com.liveramp.hyperminhash.demo;
 
 import java.util.Arrays;
+import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.liveramp.hyperminhash.BetaMinHash;
 
 public class DemoBetaMinHash {
-  public static void main(String[] args) {
+  private static final int NUM_THREADS = Runtime.getRuntime().availableProcessors();
+  private static ExecutorService threadPool = Executors.newFixedThreadPool(4);
+  private static Random rng = new Random();
+
+  public static void main(String[] args) throws InterruptedException {
     runDemo();
   }
 
-  private static void runDemo() {
-    runSkewTest();
-    runTestLoopForNSketches(2);
-    runTestLoopForNSketches(3);
-    runTestLoopForNSketches(4);
+  private static void runDemo() throws InterruptedException {
+    //    runSkewTest();
+    //    runTestLoopForNSketches(2);
+    //    runTestLoopForNSketches(3);
+    //    runTestLoopForNSketches(4);
+    //    runJaccardIndexEstimation(2);
+    long t0 = System.currentTimeMillis();
+    final AtomicInteger ai = new AtomicInteger(0);
+    System.out.println("begin muh dude");
+    for (int i = 0; i < 1_000_000_000; i++) {
+      threadPool.submit(() -> {
+        int c = ai.incrementAndGet();
+        if (c % 1_000_000 == 0) {
+          System.out.println("c: " + c);
+        }
+      });
+    }
+    long t1 = System.currentTimeMillis();
+    System.out.println("needed " + (t1 - t0) + " to submit tasks");
+    System.out.println("done: " + ai.get());
+    threadPool.shutdown();
+    threadPool.awaitTermination(1l, TimeUnit.DAYS);
+    System.out.println("needed " + (System.currentTimeMillis() - t0) + " to run all tasks");
+    System.out.println("terminated: " + ai.get());
   }
 
   private static long[] getSketchSizes(int numSketches, long size) {
@@ -24,36 +52,65 @@ public class DemoBetaMinHash {
 
   private static void runSkewTest() {
     System.out.println(getFormattedHeader(2));
-
     for (long smallSetSize = 1000; smallSetSize <= 10_000_000; smallSetSize *= 10) {
-      for (double frac = 0.1; frac <= 1.0; frac += 0.3) {
-        runTestIteration((long)(frac * smallSetSize), smallSetSize, 10_000_000_000L);
-      }
+      final long fSmallSetSize = smallSetSize;
+      runTestIteration(fSmallSetSize, fSmallSetSize, 1_000_000_000L);
     }
 
     System.out.println("\n\n\n\n");
   }
 
-  private static void runTestLoopForNSketches(int numSketches) {
+  private static void runJaccardIndexEstimation(int numSketchesToBuild) {
+    System.out.println(getFormattedHeader(numSketchesToBuild));
+    for (long order = 1_000_000_000; order <= 1_000_000_000; order *= 10) {
+      for (int i = 1; i <= 10; i++) {
+        for (double jaccardIndex = 0.00_000_000_001; jaccardIndex < 0.0_000_001; jaccardIndex *= 10) {
+          for (int j = 1; j <= 10; j++) {
+            double jac = jaccardIndex * j;
+            long unionSize = plusMinusThreePercent(order * i);
+            long intersectionSize = (long)(jac * unionSize);
+
+            if (intersectionSize <= 0) {
+              continue;
+            }
+
+            long sketchSize = (long)((unionSize - intersectionSize) / (double)numSketchesToBuild) + intersectionSize;
+            //            runTestIteration(intersectionSize, getSketchSizes(numSketchesToBuild, sketchSize))
+            threadPool.submit(() -> runTestIteration(intersectionSize, getSketchSizes(numSketchesToBuild, sketchSize)));
+
+          }
+        }
+      }
+    }
+  }
+
+  private static void runTestLoopForNSketches(final int numSketches) {
     System.out.println(getFormattedHeader(numSketches));
+
     // 1k, 10k, 100k
     for (long sketchSizeOrder = 1_000; sketchSizeOrder < 100_000; sketchSizeOrder *= 10) {
-      for (long i = 1; i <= 10; i++) {
+      final long fSketchSizeOrder = sketchSizeOrder;
+      for (byte i = 1; i <= 10; i++) {
+        final byte fi = i;
         for (double jaccardIndex = 0.001; jaccardIndex <= 1; jaccardIndex *= 10) {
-          runTestIteration((long)(jaccardIndex * sketchSizeOrder * i), getSketchSizes(numSketches, sketchSizeOrder * i));
+          final double fJaccardIndex = jaccardIndex;
+          runTestIteration((long)(fJaccardIndex * fSketchSizeOrder * fi), getSketchSizes(numSketches, fSketchSizeOrder * fi));
         }
       }
     }
 
     // 100k, 1mil, 10mil, 100mil, 1bil, 10bil
-    for (long sketchSizeOrder = 100_000; sketchSizeOrder < 10_000_000_000L; sketchSizeOrder *= 10) {
-      for (long i = 1; i < 10; i *= 5) {
+    for (long sketchSizeOrder = 100_000; sketchSizeOrder < 1_000_000_000L; sketchSizeOrder *= 10) {
+      final long fSketchSizeOrder = sketchSizeOrder;
+      for (byte i = 1; i < 10; i *= 5) {
+        final byte fi = i;
         for (double jaccardIndex = 0.0001; jaccardIndex <= 1; jaccardIndex *= 10) {
-          runTestIteration((long)(jaccardIndex * sketchSizeOrder * i), getSketchSizes(numSketches, sketchSizeOrder * i));
+          final double fJaccardIndex = jaccardIndex;
+          runTestIteration((long)(fJaccardIndex * fSketchSizeOrder * fi), getSketchSizes(numSketches, fSketchSizeOrder * fi));
         }
       }
     }
-
+    // block until all threadpool tasks are complete
     System.out.println("\n\n\n\n");
   }
 
@@ -62,11 +119,13 @@ public class DemoBetaMinHash {
 
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < sketches.length; i++) {
+      // hack
       sb.append(sketchSizes[i] + ", ");
       sb.append(sketches[i].cardinality() + ", ");
     }
 
     long exactUnionSize = sum(sketchSizes) - ((sketchSizes.length - 1) * exactIntersectionSize);
+
     sb.append(exactUnionSize + ", ");
     sb.append(BetaMinHash.union(sketches) + ", ");
 
@@ -75,6 +134,12 @@ public class DemoBetaMinHash {
 
     // jaccard
     sb.append(exactIntersectionSize / (double)exactUnionSize + ", ");
+    if (exactIntersectionSize / (double)exactUnionSize < 0) {
+      System.out.println("oh boy");
+      throw new RuntimeException();
+    }
+
+
     sb.append(BetaMinHash.similarity(sketches));
 
     System.out.println(sb.toString());
@@ -87,6 +152,7 @@ public class DemoBetaMinHash {
     }
     return sum;
   }
+
 
   /**
    * The sum of sketch sizes can't be larger than Long.MAX_VALUE
@@ -164,5 +230,10 @@ public class DemoBetaMinHash {
     }
     sb.deleteCharAt(sb.length() - 1);
     return sb.toString();
+  }
+
+  private static long plusMinusThreePercent(long x) {
+    double pct = (rng.nextInt() % 3.1) / 100.0;
+    return (long)((1 + pct) * x);
   }
 }
