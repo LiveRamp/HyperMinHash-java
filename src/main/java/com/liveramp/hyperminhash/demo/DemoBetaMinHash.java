@@ -21,7 +21,7 @@ public class DemoBetaMinHash {
     System.out.println("---- Begin Demo ----");
     runJaccardIndexEstimation(2);
     threadPool.shutdown();
-    threadPool.awaitTermination(1l, TimeUnit.DAYS);
+    threadPool.awaitTermination(2l, TimeUnit.DAYS);
     System.out.println("---- Success ----");
   }
 
@@ -29,16 +29,6 @@ public class DemoBetaMinHash {
     long[] out = new long[numSketches];
     Arrays.fill(out, size);
     return out;
-  }
-
-  private static void runSkewTest() {
-    System.out.println(getFormattedHeader(2));
-    for (long smallSetSize = 1000; smallSetSize <= 10_000_000; smallSetSize *= 10) {
-      final long fSmallSetSize = smallSetSize;
-      runTestIteration(fSmallSetSize, fSmallSetSize, 1_000_000_000L);
-    }
-
-    System.out.println("\n\n\n\n");
   }
 
   private static void runJaccardIndexEstimation(int numSketchesToBuild) {
@@ -54,45 +44,13 @@ public class DemoBetaMinHash {
             if (intersectionSize <= 0) {
               continue;
             }
-
             long sketchSize = (long)((unionSize - intersectionSize) / (double)numSketchesToBuild) + intersectionSize;
             //            runTestIteration(intersectionSize, getSketchSizes(numSketchesToBuild, sketchSize))
             threadPool.submit(() -> runTestIteration(intersectionSize, getSketchSizes(numSketchesToBuild, sketchSize)));
-
           }
         }
       }
     }
-  }
-
-  private static void runTestLoopForNSketches(final int numSketches) {
-    System.out.println(getFormattedHeader(numSketches));
-
-    // 1k, 10k, 100k
-    for (long sketchSizeOrder = 1_000; sketchSizeOrder < 100_000; sketchSizeOrder *= 10) {
-      final long fSketchSizeOrder = sketchSizeOrder;
-      for (byte i = 1; i <= 10; i++) {
-        final byte fi = i;
-        for (double jaccardIndex = 0.001; jaccardIndex <= 1; jaccardIndex *= 10) {
-          final double fJaccardIndex = jaccardIndex;
-          runTestIteration((long)(fJaccardIndex * fSketchSizeOrder * fi), getSketchSizes(numSketches, fSketchSizeOrder * fi));
-        }
-      }
-    }
-
-    // 100k, 1mil, 10mil, 100mil, 1bil, 10bil
-    for (long sketchSizeOrder = 100_000; sketchSizeOrder < 1_000_000_000L; sketchSizeOrder *= 10) {
-      final long fSketchSizeOrder = sketchSizeOrder;
-      for (byte i = 1; i < 10; i *= 5) {
-        final byte fi = i;
-        for (double jaccardIndex = 0.0001; jaccardIndex <= 1; jaccardIndex *= 10) {
-          final double fJaccardIndex = jaccardIndex;
-          runTestIteration((long)(fJaccardIndex * fSketchSizeOrder * fi), getSketchSizes(numSketches, fSketchSizeOrder * fi));
-        }
-      }
-    }
-    // block until all threadpool tasks are complete
-    System.out.println("\n\n\n\n");
   }
 
   private static void runTestIteration(long exactIntersectionSize, long... sketchSizes) {
