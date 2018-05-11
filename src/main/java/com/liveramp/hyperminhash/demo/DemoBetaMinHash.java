@@ -5,13 +5,12 @@ import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.liveramp.hyperminhash.BetaMinHash;
 
 public class DemoBetaMinHash {
-  private static final int NUM_THREADS = Runtime.getRuntime().availableProcessors();
-  private static ExecutorService threadPool = Executors.newFixedThreadPool(4);
+  private static final int NUM_THREADS = 15;
+  private static ExecutorService threadPool = Executors.newFixedThreadPool(NUM_THREADS);
   private static Random rng = new Random();
 
   public static void main(String[] args) throws InterruptedException {
@@ -19,29 +18,11 @@ public class DemoBetaMinHash {
   }
 
   private static void runDemo() throws InterruptedException {
-    //    runSkewTest();
-    //    runTestLoopForNSketches(2);
-    //    runTestLoopForNSketches(3);
-    //    runTestLoopForNSketches(4);
-    //    runJaccardIndexEstimation(2);
-    long t0 = System.currentTimeMillis();
-    final AtomicInteger ai = new AtomicInteger(0);
-    System.out.println("begin muh dude");
-    for (int i = 0; i < 1_000_000_000; i++) {
-      threadPool.submit(() -> {
-        int c = ai.incrementAndGet();
-        if (c % 1_000_000 == 0) {
-          System.out.println("c: " + c);
-        }
-      });
-    }
-    long t1 = System.currentTimeMillis();
-    System.out.println("needed " + (t1 - t0) + " to submit tasks");
-    System.out.println("done: " + ai.get());
+    System.out.println("---- Begin Demo ----");
+    runJaccardIndexEstimation(2);
     threadPool.shutdown();
     threadPool.awaitTermination(1l, TimeUnit.DAYS);
-    System.out.println("needed " + (System.currentTimeMillis() - t0) + " to run all tasks");
-    System.out.println("terminated: " + ai.get());
+    System.out.println("---- Success ----");
   }
 
   private static long[] getSketchSizes(int numSketches, long size) {
@@ -141,7 +122,6 @@ public class DemoBetaMinHash {
 
 
     sb.append(BetaMinHash.similarity(sketches));
-
     System.out.println(sb.toString());
   }
 
@@ -164,22 +144,20 @@ public class DemoBetaMinHash {
     }
 
     long counter = 0;
-
     // add intersecting items
     for (int i = 0; i < intersectionSize; i++) {
       byte[] val = (counter++ + "").getBytes();
       for (BetaMinHash sketch : out) {
         sketch.add(val);
       }
-    }
 
+    }
     // add disjoint items
     for (int i = 0; i < sketchSizes.length; i++) {
       for (int j = 0; j < (sketchSizes[i] - intersectionSize); j++) {
         out[i].add((counter++ + "").getBytes());
       }
     }
-
     return out;
   }
 
