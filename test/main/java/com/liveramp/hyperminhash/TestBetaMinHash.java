@@ -41,27 +41,6 @@ public class TestBetaMinHash {
   }
 
   @Test
-  public void testReallyLargeCardinality() {
-    //    // This test succeeds up to 10 billion elements, but to keep build times sane we're keeping it smaller
-    //    BetaMinHash sk = new BetaMinHash();
-    //    int step = 10_000;
-    //    for (long i = 1; i <= 100_000_000; i++) {
-    //
-    //      sk.add((i + "").getBytes());
-    //
-    //
-    //      if (i % step == 0) {
-    //        long exact = i;
-    //        long res = sk.cardinality();
-    //        step *= 10;
-    //
-    //        double pctError = 100 * getError(res, exact);
-    //        assertTrue(pctError <= 3);
-    //      }
-    //    }
-  }
-
-  @Test
   public void testMerge() {
     BetaMinHash sk1 = new BetaMinHash();
     BetaMinHash sk2 = new BetaMinHash();
@@ -188,23 +167,6 @@ public class TestBetaMinHash {
         sketches[i % sketches.length].add(val);
       }
     }
-  }
-
-  @Test
-  public void testNoIntersection() {
-    BetaMinHash sk1 = new BetaMinHash();
-    BetaMinHash sk2 = new BetaMinHash();
-
-    for (int i = 0; i < 1000000; i++) {
-      sk1.add((i + "").getBytes());
-    }
-
-    for (int i = 1000000; i < 2000000; i++) {
-      sk2.add((i + "").getBytes());
-    }
-
-    long intersection = BetaMinHash.intersection(sk1, sk2);
-    assertEquals(String.format("Expected zero intersection but found %s", intersection), 0, intersection);
   }
 
   /**
