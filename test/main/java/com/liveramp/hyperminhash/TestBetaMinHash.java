@@ -70,7 +70,7 @@ public class TestBetaMinHash {
     int iters = 20;
     int k = 1_000_000;
 
-    for (int j = 1; j <= iters; j++) {
+    for (int j = 1; j < iters; j++) {
 
       BetaMinHash sk1 = new BetaMinHash();
       BetaMinHash sk2 = new BetaMinHash();
