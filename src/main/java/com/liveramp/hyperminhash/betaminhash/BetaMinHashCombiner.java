@@ -1,7 +1,55 @@
-package com.liveramp.hyperminhash;
+package com.liveramp.hyperminhash.betaminhash;
 
-class BetaMinHashSimilarityGetter {
-  public static double similarity(BetaMinHash... sketches) {
+import com.liveramp.hyperminhash.SketchCombiner;
+
+public class BetaMinHashCombiner implements SketchCombiner<BetaMinHash> {
+
+  private static final BetaMinHashCombiner INSTANCE = new BetaMinHashCombiner();
+  private static final long serialVersionUID = 1L;
+
+  public static BetaMinHashCombiner getInstance() {
+    return INSTANCE;
+  }
+
+  private BetaMinHashCombiner() {
+  }
+
+  @Override
+  public final BetaMinHash union(BetaMinHash... sketches) {
+    if (sketches.length == 0) {
+      throw new IllegalArgumentException("Input sketches cannot be empty.");
+    }
+
+    if (sketches.length == 1) {
+      return sketches[0];
+    }
+
+    int numRegisters = sketches[0].registers.length;
+
+    BetaMinHash mergedSketch = new BetaMinHash(sketches[0]);
+    for (int i = 0; i < numRegisters; i++) {
+      for (BetaMinHash sketch : sketches) {
+        mergedSketch.registers[i] = max(
+            mergedSketch.registers[i],
+            sketch.registers[i]
+        );
+      }
+    }
+
+    return mergedSketch;
+  }
+
+  @Override
+  public long intersectionCardinality(BetaMinHash... sketches) {
+    if (sketches.length == 0) {
+      throw new IllegalArgumentException("Input sketches cannot be empty.");
+    }
+
+    return (long) (similarity(sketches) * union(sketches).cardinality());
+  }
+
+  @Override
+  public double similarity(BetaMinHash... sketches) {
     // Algorithm 4 in HyperMinHash paper
     if (sketches.length == 0) {
       throw new IllegalArgumentException("Input sketches cannot be empty.");
@@ -17,7 +65,8 @@ class BetaMinHashSimilarityGetter {
       if (sketches[0].registers[i] != 0) {
         boolean itemInIntersection = true;
         for (BetaMinHash sketch : sketches) {
-          itemInIntersection = itemInIntersection && sketches[0].registers[i] == sketch.registers[i];
+          itemInIntersection =
+              itemInIntersection && sketches[0].registers[i] == sketch.registers[i];
         }
 
         if (itemInIntersection) {
@@ -43,7 +92,6 @@ class BetaMinHashSimilarityGetter {
       cardinalities[i++] = sk.cardinality();
     }
 
-
     int p = BetaMinHash.P;
     int q = BetaMinHash.Q;
     int r = BetaMinHash.R;
@@ -53,7 +101,7 @@ class BetaMinHashSimilarityGetter {
       return 0;
     }
 
-    return (C - numExpectedCollisions) / (double)N;
+    return (C - numExpectedCollisions) / (double) N;
   }
 
   private static double expectedCollision(int p, int q, int r, double... cardinalities) {
@@ -87,4 +135,7 @@ class BetaMinHashSimilarityGetter {
     return x * Math.pow(2, p);
   }
 
+  private static short max(short a, short b) {
+    return a > b ? a : b;
+  }
 }

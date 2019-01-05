@@ -1,4 +1,4 @@
-package com.liveramp.hyperminhash;
+package com.liveramp.hyperminhash.betaminhash;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -23,7 +23,9 @@ public class BetaMinHashWritable implements Writable {
   }
 
   public BetaMinHashWritable combine(BetaMinHashWritable other) {
-    BetaMinHash mergedSketch = BetaMinHash.merge(new BetaMinHash(registers), other.getSketch());
+    BetaMinHash mergedSketch = BetaMinHashCombiner
+        .getInstance()
+        .union(new BetaMinHash(registers), other.getSketch());
     return new BetaMinHashWritable(mergedSketch);
   }
 

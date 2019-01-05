@@ -1,12 +1,13 @@
 package com.liveramp.hyperminhash.demo;
 
+import com.liveramp.hyperminhash.betaminhash.BetaMinHashCombiner;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import com.liveramp.hyperminhash.BetaMinHash;
+import com.liveramp.hyperminhash.betaminhash.BetaMinHash;
 
 public class DemoBetaMinHash {
   private static final int NUM_THREADS = 15;
@@ -54,7 +55,8 @@ public class DemoBetaMinHash {
   }
 
   private static void runTestIteration(long exactIntersectionSize, long... sketchSizes) {
-    BetaMinHash[] sketches = buildIntersectingSketches(exactIntersectionSize, sketchSizes);
+    final BetaMinHash[] sketches = buildIntersectingSketches(exactIntersectionSize, sketchSizes);
+    final BetaMinHashCombiner combiner = BetaMinHashCombiner.getInstance();
 
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < sketches.length; i++) {
@@ -66,10 +68,10 @@ public class DemoBetaMinHash {
     long exactUnionSize = sum(sketchSizes) - ((sketchSizes.length - 1) * exactIntersectionSize);
 
     sb.append(exactUnionSize + ", ");
-    sb.append(BetaMinHash.union(sketches) + ", ");
+    sb.append(combiner.union(sketches).cardinality() + ", ");
 
     sb.append(exactIntersectionSize + ", ");
-    sb.append(BetaMinHash.intersection(sketches) + ", ");
+    sb.append(combiner.intersectionCardinality(sketches) + ", ");
 
     // jaccard
     sb.append(exactIntersectionSize / (double)exactUnionSize + ", ");
@@ -79,7 +81,7 @@ public class DemoBetaMinHash {
     }
 
 
-    sb.append(BetaMinHash.similarity(sketches));
+    sb.append(combiner.similarity(sketches));
     System.out.println(sb.toString());
   }
 
@@ -106,14 +108,14 @@ public class DemoBetaMinHash {
     for (int i = 0; i < intersectionSize; i++) {
       byte[] val = (counter++ + "").getBytes();
       for (BetaMinHash sketch : out) {
-        sketch.add(val);
+        sketch.offer(val);
       }
 
     }
     // add disjoint items
     for (int i = 0; i < sketchSizes.length; i++) {
       for (int j = 0; j < (sketchSizes[i] - intersectionSize); j++) {
-        out[i].add((counter++ + "").getBytes());
+        out[i].offer((counter++ + "").getBytes());
       }
     }
     return out;

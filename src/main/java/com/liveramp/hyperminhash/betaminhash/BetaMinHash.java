@@ -1,5 +1,6 @@
-package com.liveramp.hyperminhash;
+package com.liveramp.hyperminhash.betaminhash;
 
+import com.liveramp.hyperminhash.IntersectionSketch;
 import java.nio.ByteBuffer;
 
 import util.hash.MetroHash128;
@@ -20,19 +21,22 @@ import util.hash.MetroHash128;
  * current values should provide sufficient accuracy for set cardinalities up to 2^89 (see Hyperminhash paper for
  * reference).
  * <p>
+ * If you want to be able to combine multiple BetaMinHash instances, or compute their intersection,
+ * you can use {@link BetaMinHashCombiner}.
+ * <p>
  * If you'd like this class to support custom Q or R or P values, please open a github issue.
  * <p>
  */
-public class BetaMinHash {
+public class BetaMinHash implements IntersectionSketch {
   // HLL Precision parameter
-  public final static int P = 14;
-  public final static int NUM_REGISTERS = (int)Math.pow(2, P);
+  public static final int P = 14;
+  public static final int NUM_REGISTERS = (int)Math.pow(2, P);
 
 
   // TODO add actual validation if necessary
   // Q + R must always be <= 16 since we're packing values into 16 bit registers
-  public final static int Q = 6;
-  public final static int R = 10;
+  public static final int Q = 6;
+  public static final int R = 10;
 
   final short[] registers;
 
@@ -45,21 +49,42 @@ public class BetaMinHash {
     System.arraycopy(registers, 0, this.registers, 0, registers.length);
   }
 
+  /** Create a deep copy of another {@link BetaMinHash}. */
   public BetaMinHash(BetaMinHash other) {
     this(other.registers);
   }
 
-  public void add(byte[] val) {
+  @Override
+  public long cardinality() {
+    return BetaMinHashCardinalityGetter.cardinality(this);
+  }
+
+  @Override
+  public boolean offer(byte[] val) {
     MetroHash128 hash = new MetroHash128(1337).apply(ByteBuffer.wrap(val));
     ByteBuffer buf = ByteBuffer.allocate(16);
     hash.writeBigEndian(buf);
-    addHash(buf);
+    return addHash(buf);
+  }
+
+  @Override
+  public int sizeInBytes() {
+    return NUM_REGISTERS * Short.BYTES;
+  }
+
+  @Override
+  public byte[] getBytes() {
+    ByteBuffer byteBuffer = ByteBuffer.allocate(sizeInBytes());
+    for (short s : registers) {
+      byteBuffer.putShort(s);
+    }
+    return byteBuffer.array();
   }
 
   /**
    * @param _128BitHash
    */
-  private void addHash(ByteBuffer _128BitHash) {
+  private boolean addHash(ByteBuffer _128BitHash) {
     if (_128BitHash.array().length != 16) {
       throw new IllegalArgumentException("input hash should be 16 bytes");
     }
@@ -75,7 +100,10 @@ public class BetaMinHash {
     short packedRegister = packIntoRegister(leftmostOneBitPosition, rBits);
     if (registers[registerIndex] < packedRegister) {
       registers[registerIndex] = packedRegister;
+      return true;
     }
+
+    return false;
   }
 
   private int getLeftmostPBits(long hash) {
@@ -121,37 +149,5 @@ public class BetaMinHash {
     // Q is at most 6, which means that with R<=10, we should be able to store these two
     // numbers in the same register
     return (short)((leftmostOnebitPosition << R) | rightmostRBits);
-  }
-
-  public long cardinality() {
-    return BetaMinHashCardinalityGetter.cardinality(this);
-  }
-
-  /**
-   * @return Merged sketch representing the input sketches
-   */
-  public static BetaMinHash merge(BetaMinHash... sketches) {
-    return BetaMinHashMergeGetter.merge(sketches);
-  }
-
-  /**
-   * @return Union cardinality estimation
-   */
-  public static long union(BetaMinHash... sketches) {
-    return merge(sketches).cardinality();
-  }
-
-  /**
-   * @return Intersection cardinality estimation
-   */
-  public static long intersection(BetaMinHash... sketches) {
-    return BetaMinHashIntersectionGetter.getIntersection(sketches);
-  }
-
-  /**
-   * @return Jaccard index estimation
-   */
-  public static double similarity(BetaMinHash... sketches) {
-    return BetaMinHashSimilarityGetter.similarity(sketches);
   }
 }
