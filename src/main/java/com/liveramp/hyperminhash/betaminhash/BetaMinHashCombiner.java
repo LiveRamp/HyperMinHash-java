@@ -7,11 +7,46 @@ public class BetaMinHashCombiner implements SketchCombiner<BetaMinHash> {
   private static final BetaMinHashCombiner INSTANCE = new BetaMinHashCombiner();
   private static final long serialVersionUID = 1L;
 
+  private BetaMinHashCombiner() {
+  }
+
   public static BetaMinHashCombiner getInstance() {
     return INSTANCE;
   }
 
-  private BetaMinHashCombiner() {
+  private static double expectedCollision(int p, int q, int r, double... cardinalities) {
+    final int _2q = 1 << q;
+    final int _2r = 1 << r;
+
+    double x = 0;
+    double b1 = 0;
+    double b2 = 0;
+
+    for (int i = 1; i <= _2q; i++) {
+      for (int j = 1; j <= _2r; j++) {
+        if (i != _2q) {
+          double den = Math.pow(2, p + r + i);
+          b1 = (_2r + j) / den;
+          b2 = (_2r + j + 1) / den;
+        } else {
+          double den = Math.pow(2, p + r + i - 1);
+          b1 = j / den;
+          b2 = (j + 1) / den;
+        }
+
+        double product = 1;
+        for (double cardinality : cardinalities) {
+          product *= Math.pow(1 - b2, cardinality) - Math.pow(1 - b1, cardinality);
+        }
+
+        x += product;
+      }
+    }
+    return x * Math.pow(2, p);
+  }
+
+  private static short max(short a, short b) {
+    return a > b ? a : b;
   }
 
   @Override
@@ -102,40 +137,5 @@ public class BetaMinHashCombiner implements SketchCombiner<BetaMinHash> {
     }
 
     return (C - numExpectedCollisions) / (double) N;
-  }
-
-  private static double expectedCollision(int p, int q, int r, double... cardinalities) {
-    final int _2q = 1 << q;
-    final int _2r = 1 << r;
-
-    double x = 0;
-    double b1 = 0;
-    double b2 = 0;
-
-    for (int i = 1; i <= _2q; i++) {
-      for (int j = 1; j <= _2r; j++) {
-        if (i != _2q) {
-          double den = Math.pow(2, p + r + i);
-          b1 = (_2r + j) / den;
-          b2 = (_2r + j + 1) / den;
-        } else {
-          double den = Math.pow(2, p + r + i - 1);
-          b1 = j / den;
-          b2 = (j + 1) / den;
-        }
-
-        double product = 1;
-        for (double cardinality : cardinalities) {
-          product *= Math.pow(1 - b2, cardinality) - Math.pow(1 - b1, cardinality);
-        }
-
-        x += product;
-      }
-    }
-    return x * Math.pow(2, p);
-  }
-
-  private static short max(short a, short b) {
-    return a > b ? a : b;
   }
 }

@@ -4,10 +4,10 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Arrays;
-
 import org.apache.hadoop.io.Writable;
 
 public class BetaMinHashWritable implements Writable {
+
   private short[] registers;
 
   public BetaMinHashWritable() {
@@ -51,7 +51,7 @@ public class BetaMinHashWritable implements Writable {
       return false;
     }
 
-    BetaMinHashWritable that = (BetaMinHashWritable)o;
+    BetaMinHashWritable that = (BetaMinHashWritable) o;
 
     return Arrays.equals(registers, that.registers);
   }

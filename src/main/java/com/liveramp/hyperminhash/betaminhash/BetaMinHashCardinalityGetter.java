@@ -1,14 +1,15 @@
 package com.liveramp.hyperminhash.betaminhash;
 
 class BetaMinHashCardinalityGetter {
+
   static long cardinality(BetaMinHash sketch) {
     // Formula (2) in Qin et al.
     SumAndZeros saz = getRegisterSumAndZeros(sketch);
     double sum = saz.sum;
     double zeros = saz.zeros;
-    double mHat = (double)BetaMinHash.NUM_REGISTERS;
+    double mHat = (double) BetaMinHash.NUM_REGISTERS;
     double alpha = alpha(BetaMinHash.NUM_REGISTERS);
-    return (long)(alpha * mHat * (mHat - zeros) / (beta(zeros) + sum));
+    return (long) (alpha * mHat * (mHat - zeros) / (beta(zeros) + sum));
   }
 
   private static SumAndZeros getRegisterSumAndZeros(BetaMinHash sketch) {
@@ -18,18 +19,18 @@ class BetaMinHashCardinalityGetter {
       if (leadingZeros == 0) {
         uninitializedRegisters++;
       }
-      sum += 1 / Math.pow(2, (double)leadingZeros);
+      sum += 1 / Math.pow(2, (double) leadingZeros);
     }
     return new SumAndZeros(sum, uninitializedRegisters);
   }
 
   private static byte leadingZeros(short register, int q) {
-    return (byte)(register >>> (Short.SIZE - q));
+    return (byte) (register >>> (Short.SIZE - q));
   }
 
   /**
-   * Alpha parameter as shown in Figure 3 of the Hyperloglog paper by Flajolet, Philippe, et al. found here:
-   * http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf.
+   * Alpha parameter as shown in Figure 3 of the Hyperloglog paper by Flajolet, Philippe, et al.
+   * found here: http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf.
    *
    * @param hllSize number of registers used in the HLL.
    * @return the alpha value
@@ -43,7 +44,7 @@ class BetaMinHashCardinalityGetter {
       case 64:
         return 0.709;
       default:
-        return 0.7213 / (1 + 1.079 / (double)hllSize);
+        return 0.7213 / (1 + 1.079 / (double) hllSize);
     }
   }
 
@@ -64,6 +65,7 @@ class BetaMinHashCardinalityGetter {
   }
 
   private static class SumAndZeros {
+
     final double sum;
     final double zeros;
 
