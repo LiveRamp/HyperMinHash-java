@@ -19,16 +19,17 @@ public class BetaMinHashWritable implements Writable {
   }
 
   public BetaMinHash getSketch() {
-    return new BetaMinHash(registers);
+    return BetaMinHash.deepCopyFromRegisters(registers);
   }
 
   public BetaMinHashWritable combine(BetaMinHashWritable other) {
     BetaMinHash mergedSketch = BetaMinHashCombiner
         .getInstance()
-        .union(new BetaMinHash(registers), other.getSketch());
+        .union(BetaMinHash.wrapRegisters(registers), other.getSketch());
     return new BetaMinHashWritable(mergedSketch);
   }
 
+  @Override
   public void write(DataOutput dataOutput) throws IOException {
     for (short register : registers) {
       dataOutput.writeShort(register);

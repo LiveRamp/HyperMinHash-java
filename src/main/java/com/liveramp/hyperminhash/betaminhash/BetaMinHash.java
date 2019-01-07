@@ -2,6 +2,7 @@ package com.liveramp.hyperminhash.betaminhash;
 
 import com.liveramp.hyperminhash.IntersectionSketch;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import util.hash.MetroHash128;
 
 /**
@@ -46,16 +47,54 @@ public class BetaMinHash implements IntersectionSketch {
     registers = new short[NUM_REGISTERS];
   }
 
-  BetaMinHash(short[] registers) {
-    this();
-    System.arraycopy(registers, 0, this.registers, 0, registers.length);
+  private BetaMinHash(short[] registers) {
+    this.registers = registers;
   }
 
   /**
    * Create a deep copy of another {@link BetaMinHash}.
    */
-  public BetaMinHash(BetaMinHash other) {
-    this(other.registers);
+  public static BetaMinHash deepCopy(BetaMinHash other) {
+    return deepCopyFromRegisters(other.registers);
+  }
+
+  /**
+   * Create a BetaMinHash from the serialized representation returned by {@link #getBytes()}.
+   */
+  public static BetaMinHash fromBytes(byte[] bytes) {
+    final int expectedNumBytes = 2 * NUM_REGISTERS; // 2 bytes per short
+    if (bytes.length != expectedNumBytes) {
+      throw new IllegalArgumentException(String.format(
+          "Expected exactly %d bytes, but there are %d",
+          expectedNumBytes,
+          bytes.length));
+    }
+
+    final ByteBuffer buffer = ByteBuffer.wrap(bytes);
+    final short[] registers = new short[NUM_REGISTERS];
+    for (int i = 0; i < NUM_REGISTERS; i++) {
+      registers[i] = buffer.getShort();
+    }
+
+    return wrapRegisters(registers);
+  }
+
+  static BetaMinHash deepCopyFromRegisters(short[] registers) {
+    if (registers.length != NUM_REGISTERS) {
+      throw new IllegalArgumentException(String.format(
+          "Expected exactly %d registers, but there are %d",
+          NUM_REGISTERS,
+          registers.length));
+    }
+
+    final short[] registersCopy = new short[NUM_REGISTERS];
+    System.arraycopy(registers, 0, registers, 0, NUM_REGISTERS);
+
+    return wrapRegisters(registersCopy);
+  }
+
+  static BetaMinHash wrapRegisters(short[] registers) {
+    return new BetaMinHash(registers);
   }
 
   @Override
@@ -83,6 +122,23 @@ public class BetaMinHash implements IntersectionSketch {
       byteBuffer.putShort(s);
     }
     return byteBuffer.array();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof BetaMinHash)) {
+      return false;
+    }
+    BetaMinHash that = (BetaMinHash) o;
+    return Arrays.equals(registers, that.registers);
+  }
+
+  @Override
+  public int hashCode() {
+    return Arrays.hashCode(registers);
   }
 
   /**

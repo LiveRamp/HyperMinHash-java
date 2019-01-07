@@ -13,7 +13,8 @@ public interface SketchCombiner<T extends IntersectionSketch> extends Serializab
 
   /**
    * Return a sketch representing the union of the sets represented by the sketches in {@code
-   * sketches}.
+   * sketches}. Sketches passed will not be mutated. If only a single sketch is passed, this method
+   * will return a deep copy.
    */
   T union(T... sketches);
 

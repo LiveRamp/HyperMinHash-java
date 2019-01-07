@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.codec.binary.Hex;
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -154,6 +155,17 @@ public class TestBetaMinHash {
       intersectionSize <<= 1;
       sketchSize <<= 1;
     }
+  }
+
+  @Test
+  public void testToFromBytes() {
+    final BetaMinHash original = new BetaMinHash();
+    original.offer("test data".getBytes());
+
+    final byte[] serialized = original.getBytes();
+    final BetaMinHash deSerialized = BetaMinHash.fromBytes(serialized);
+
+    Assert.assertEquals(original, deSerialized);
   }
 
   // builds equally sized sketches which share numSharedElements items
