@@ -65,27 +65,31 @@
   </developers>
 
   <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skip.tests>false</skip.tests>
     <hadoop.version>2.5.0</hadoop.version>
   </properties>
 
   <build>
+    <!-- Be explicit about where maven should look for source and test files -->
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <testSourceDirectory>test/main/java</testSourceDirectory>
+
     <plugins>
+      <!-- Used to pin the compiler to JDK 1.8 -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-          </execution>
-        </executions>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
         <configuration>
-          <finalName>uber-${artifactId}-${version}</finalName>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
+
+      <!--
+      Used to publish artifacts produced by this project to Sonatype (which is mirrored to
+      Maven Central).
+      -->
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -124,6 +128,31 @@
       </build>
     </profile>
 
+    <!-- Used to generate a stand-alone JAR which includes all dependencies -->
+    <profile>
+      <id>uberjar</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <finalName>uber-${artifactId}-${version}</finalName>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- Used to package the Javadocs and sourcecode for this project -->
     <profile>
       <id>build-src-and-docs</id>
       <activation>
@@ -190,12 +219,12 @@
   <distributionManagement>
 
     <snapshotRepository>
-      <id>ossrh</id>
+      <id>ossrh-snapshots</id>
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
 
     <repository>
-      <id>ossrh</id>
+      <id>ossrh-releases</id>
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
 
