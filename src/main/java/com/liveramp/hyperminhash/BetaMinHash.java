@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
  * This class implements LogLog-Beta described in Qin, Kim, et al. here: https://arxiv.org/pdf/1612.02284.pdf.
  * Loglog-Beta is almost identical in accuracy to HyperLogLog and HyperLogLog++ except it performs better on cardinality
  * estimations for small datasets (n &le; 200_000). It's also much simpler to implement.
- * 
+ *
  * The log log implementation uses the values of p and beta coefficients tested in the Loglog-beta paper. It's possible
  * to use different values of P but we'd need to recompute the beta coefficients which is a computationally intensive
  * process. So for now, this impl doesn't support using different values of P. This being said the current value of P
