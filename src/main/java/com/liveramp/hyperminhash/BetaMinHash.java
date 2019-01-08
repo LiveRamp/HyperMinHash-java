@@ -1,32 +1,32 @@
 package com.liveramp.hyperminhash;
 
-import java.nio.ByteBuffer;
-
 import util.hash.MetroHash128;
+
+import java.nio.ByteBuffer;
 
 /**
  * Implementation of HyperMinHash described in Yu and Weber: https://arxiv.org/pdf/1710.08436.pdf.
  * This class implements LogLog-Beta described in Qin, Kim, et al. here: https://arxiv.org/pdf/1612.02284.pdf.
  * Loglog-Beta is almost identical in accuracy to HyperLogLog and HyperLogLog++ except it performs better on cardinality
  * estimations for small datasets (n <= 200_000). It's also much simpler to implement.
- * <p>
+ *
  * The log log implementation uses the values of p and beta coefficients tested in the Loglog-beta paper. It's possible
  * to use different values of P but we'd need to recompute the beta coefficients which is a computationally intensive
  * process. So for now, this impl doesn't support using different values of P. This being said the current value of P
  * works with high accuracy for very large cardinalities and small jaccard  indices. See the paper for more details.
- * <p>
- * <p>
+ *
  * Similarly, we use values of Q and R suggested in the HyperMinHash paper. Those are theoretically changeable, but the
  * current values should provide sufficient accuracy for set cardinalities up to 2^89 (see Hyperminhash paper for
  * reference).
- * <p>
+ *
  * If you'd like this class to support custom Q or R or P values, please open a github issue.
- * <p>
+ *
  */
 public class BetaMinHash {
+
   // HLL Precision parameter
   public final static int P = 14;
-  public final static int NUM_REGISTERS = (int)Math.pow(2, P);
+  public final static int NUM_REGISTERS = (int) Math.pow(2, P);
 
 
   // TODO add actual validation if necessary
@@ -79,7 +79,7 @@ public class BetaMinHash {
   }
 
   private int getLeftmostPBits(long hash) {
-    return (int)(hash >>> (Long.SIZE - P));
+    return (int) (hash >>> (Long.SIZE - P));
   }
 
   /**
@@ -102,11 +102,11 @@ public class BetaMinHash {
     // add a 1-bit in the 2^Qth position
     _2qSearchBits += (1 << (shiftAmount - 1));
 
-    return (byte)(Long.numberOfLeadingZeros(_2qSearchBits) + 1);
+    return (byte) (Long.numberOfLeadingZeros(_2qSearchBits) + 1);
   }
 
   private short getRightmostRBits(long hash) {
-    return (short)(hash << (Long.SIZE - R) >>> Long.SIZE - R);
+    return (short) (hash << (Long.SIZE - R) >>> Long.SIZE - R);
   }
 
   /**
@@ -120,7 +120,7 @@ public class BetaMinHash {
   private short packIntoRegister(byte leftmostOnebitPosition, short rightmostRBits) {
     // Q is at most 6, which means that with R<=10, we should be able to store these two
     // numbers in the same register
-    return (short)((leftmostOnebitPosition << R) | rightmostRBits);
+    return (short) ((leftmostOnebitPosition << R) | rightmostRBits);
   }
 
   public long cardinality() {
@@ -128,6 +128,7 @@ public class BetaMinHash {
   }
 
   /**
+   * @param sketches
    * @return Merged sketch representing the input sketches
    */
   public static BetaMinHash merge(BetaMinHash... sketches) {
@@ -135,6 +136,7 @@ public class BetaMinHash {
   }
 
   /**
+   * @param sketches
    * @return Union cardinality estimation
    */
   public static long union(BetaMinHash... sketches) {
@@ -142,6 +144,7 @@ public class BetaMinHash {
   }
 
   /**
+   * @param sketches
    * @return Intersection cardinality estimation
    */
   public static long intersection(BetaMinHash... sketches) {
@@ -149,6 +152,7 @@ public class BetaMinHash {
   }
 
   /**
+   * @param sketches 
    * @return Jaccard index estimation
    */
   public static double similarity(BetaMinHash... sketches) {
