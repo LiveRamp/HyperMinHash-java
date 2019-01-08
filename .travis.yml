@@ -7,10 +7,7 @@ install: true
 
 script:
   # First install any deps and runs tests
-  - mvn clean install test -P-build-src-and-docs -B -V
+  - mvn clean package test -P-build-src-and-docs -B -V
   # If successful, run the deploy script to publish produced artifacts
   - ./cd/deploy.sh
 
-cache:
-  directories:
-    - ~/.m2/repository
