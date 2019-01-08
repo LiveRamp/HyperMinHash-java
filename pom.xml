@@ -54,6 +54,7 @@
     <skip.tests>false</skip.tests>
     <hadoop.version>2.5.0</hadoop.version>
   </properties>
+
   <build>
     <plugins>
       <plugin>
@@ -90,4 +91,14 @@
       <version>4.12</version>
     </dependency>
   </dependencies>
+  <distributionManagement>
+    <!--
+    Snapshots should be released to this repository on Sonatype. The parent POM contains the URL
+    for the release repository, and its ID should be "ossrh".
+    -->
+    <repository>
+      <id>ossrh-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    </repository>
+  </distributionManagement>
 </project>
