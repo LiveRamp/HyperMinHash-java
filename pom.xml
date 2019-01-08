@@ -42,7 +42,6 @@
     <url>www.github.com/LiveRamp/HyperMinHash-java</url>
   </issueManagement>
 
-
   <developers>
     <developer>
       <name>Christian Hansen</name>
@@ -71,10 +70,6 @@
   </properties>
 
   <build>
-    <!-- Be explicit about where maven should look for source and test files -->
-    <sourceDirectory>src/main/java</sourceDirectory>
-    <testSourceDirectory>test/main/java</testSourceDirectory>
-
     <plugins>
       <!-- Used to pin the compiler to JDK 1.8 -->
       <plugin>
