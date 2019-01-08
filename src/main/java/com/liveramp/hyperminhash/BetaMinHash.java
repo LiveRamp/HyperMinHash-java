@@ -128,7 +128,7 @@ public class BetaMinHash {
   }
 
   /**
-   * @param sketches
+   * @param sketches sketches to merge
    * @return Merged sketch representing the input sketches
    */
   public static BetaMinHash merge(BetaMinHash... sketches) {
@@ -152,7 +152,7 @@ public class BetaMinHash {
   }
 
   /**
-   * @param sketches 
+   * @param sketches
    * @return Jaccard index estimation
    */
   public static double similarity(BetaMinHash... sketches) {
