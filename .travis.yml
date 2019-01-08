@@ -1,2 +1,17 @@
 language: java
 jdk: oraclejdk8
+
+# Since Maven installs deps, skip the install phase since it doesn't really apply.
+# This just runs the command "true" in the install phase which doesn't do much of anything.
+install: true
+
+# Script phase installs any deps and runs tests
+script: mvn clean install test -P-build-src-and-docs -B -V
+
+cache:
+  directories:
+    - ~/.m2/repository
+
+
+after_success:
+  - ./cd/deploy.sh
