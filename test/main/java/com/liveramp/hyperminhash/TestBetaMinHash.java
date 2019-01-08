@@ -1,18 +1,15 @@
 package com.liveramp.hyperminhash;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
-import org.apache.commons.codec.binary.Hex;
 import org.junit.Test;
+
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class TestBetaMinHash {
+
   @Test
   public void testZeroCardinality() {
     BetaMinHash sk = new BetaMinHash();
@@ -75,24 +72,26 @@ public class TestBetaMinHash {
       BetaMinHash sk1 = new BetaMinHash();
       BetaMinHash sk2 = new BetaMinHash();
 
-      double frac = j / (double)iters;
+      double frac = j / (double) iters;
 
       for (int i = 0; i < k; i++) {
         String str = i + "";
         sk1.add(str.getBytes());
       }
 
-      for (int i = (int)(frac * k); i < 2 * k; i++) {
+      for (int i = (int) (frac * k); i < 2 * k; i++) {
         String str = i + "";
         sk2.add(str.getBytes());
       }
 
-      long expected = (long)(k - k * frac);
+      long expected = (long) (k - k * frac);
       long result = BetaMinHash.intersection(sk1, sk2);
 
       double pctError = 100 * getError(result, expected);
       double expectedPctError = 5.0;
-      assertTrue(String.format("Expected error ratio to be at most %s but found %f", expectedPctError, pctError),
+      assertTrue(
+          String.format("Expected error ratio to be at most %s but found %f", expectedPctError,
+              pctError),
           pctError <= expectedPctError);
     }
   }
@@ -144,7 +143,8 @@ public class TestBetaMinHash {
       long actualIntersection = BetaMinHash.intersection(sk1, sk2, sk3);
       double pctError = 100 * getError(actualIntersection, expectedIntersection);
       assertTrue(
-          String.format("Expected pctError to be <2, found %f. Expected: %d, Actual: %d", pctError, expectedIntersection, actualIntersection),
+          String.format("Expected pctError to be <2, found %f. Expected: %d, Actual: %d", pctError,
+              expectedIntersection, actualIntersection),
           pctError <= 5
       );
 
@@ -154,10 +154,12 @@ public class TestBetaMinHash {
   }
 
   // builds equally sized sketches which share numSharedElements items
-  private void buildIntersectingSketches(long sketchSize, long numSharedElements, BetaMinHash... sketches) {
+  private void buildIntersectingSketches(
+      long sketchSize, long numSharedElements, BetaMinHash... sketches) {
     assert sketchSize >= numSharedElements;
 
-    for (int i = 0; i < ((sketchSize - numSharedElements) * sketches.length + numSharedElements); i++) {
+    for (int i = 0; i < ((sketchSize - numSharedElements) * sketches.length + numSharedElements);
+        i++) {
       byte[] val = (i + "").getBytes();
       if (i < numSharedElements) {
         for (BetaMinHash sketch : sketches) {
@@ -172,14 +174,12 @@ public class TestBetaMinHash {
   /**
    * Helper Methods
    **/
-  private static final String LETTER_BYTES = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  private Random rng = new Random();
 
   private String randomStringWithLength(int n) {
     byte[] b = new byte[n];
-    for (int i = 0; i < n; i++) {
-      b[i] = (byte)LETTER_BYTES.charAt(randPositiveInt() % LETTER_BYTES.length());
-    }
-    return Hex.encodeHexString(b);
+    rng.nextBytes(b);
+    return new String(b, StandardCharsets.US_ASCII);
   }
 
   private double getError(long result, long expected) {
@@ -192,10 +192,8 @@ public class TestBetaMinHash {
     }
 
     long delta = Math.abs(result - expected);
-    return delta / (double)expected;
+    return delta / (double) expected;
   }
-
-  private Random rng = new Random();
 
   int randPositiveInt() {
     return Math.abs(rng.nextInt());
