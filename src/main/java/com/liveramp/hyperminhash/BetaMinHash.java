@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
  * This class implements LogLog-Beta described in Qin, Kim, et al. here: https://arxiv.org/pdf/1612.02284.pdf.
  * Loglog-Beta is almost identical in accuracy to HyperLogLog and HyperLogLog++ except it performs better on cardinality
  * estimations for small datasets (n <= 200_000). It's also much simpler to implement.
- *
+ * 
  * The log log implementation uses the values of p and beta coefficients tested in the Loglog-beta paper. It's possible
  * to use different values of P but we'd need to recompute the beta coefficients which is a computationally intensive
  * process. So for now, this impl doesn't support using different values of P. This being said the current value of P
@@ -20,7 +20,6 @@ import java.nio.ByteBuffer;
  * reference).
  *
  * If you'd like this class to support custom Q or R or P values, please open a github issue.
- *
  */
 public class BetaMinHash {
 
@@ -136,24 +135,24 @@ public class BetaMinHash {
   }
 
   /**
-   * @param sketches
-   * @return Union cardinality estimation
+   * @param sketches for which to compute union cardinality estimate
+   * @return Union cardinality estimate
    */
   public static long union(BetaMinHash... sketches) {
     return merge(sketches).cardinality();
   }
 
   /**
-   * @param sketches
-   * @return Intersection cardinality estimation
+   * @param sketches sketches for which to compute intersection cardinality estimate
+   * @return Intersection cardinality estimate
    */
   public static long intersection(BetaMinHash... sketches) {
     return BetaMinHashIntersectionGetter.getIntersection(sketches);
   }
 
   /**
-   * @param sketches
-   * @return Jaccard index estimation
+   * @param sketches sketches for which to compute Jaccard Index
+   * @return Jaccard index estimate
    */
   public static double similarity(BetaMinHash... sketches) {
     return BetaMinHashSimilarityGetter.similarity(sketches);
