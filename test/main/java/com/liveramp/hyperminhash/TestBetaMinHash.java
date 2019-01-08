@@ -21,7 +21,7 @@ public class TestBetaMinHash {
     BetaMinHash sk = new BetaMinHash();
     int step = 10_000;
     Map<String, Boolean> unique = new HashMap<>();
-    for (int i = 1; unique.size() < 1_000_000; i++) {
+    for (int i = 1; unique.size() <= 1_000_000; i++) {
       String str = randomStringWithLength(randPositiveInt() % 32);
       sk.add(str.getBytes());
       unique.put(str, true);
@@ -32,7 +32,7 @@ public class TestBetaMinHash {
         step *= 10;
 
         double pctError = 100 * getError(res, exact);
-        assertTrue(pctError <= 2);
+        assertTrue(pctError <= 2.5);
       }
     }
   }
