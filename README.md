@@ -5,7 +5,7 @@ A Java implementation of the HyperMinHash algorithm, presented in [Yu and Weber]
 
 This library uses [Loglog-Beta](https://arxiv.org/pdf/1612.02284.pdf) for the underlying LogLog implementation. Loglog-beta is almost identical in accuracy to HyperLogLog++, except it performs better on cardinality estimations for small datasets (n <= 200k). Since we use Loglog-Beta, we refer to our implementation as BetaMinHash.
 
-In addition to the features described above, this library adds the ability to do many-way intersections between sets, a new feature not described in the original paper (though, credit to the authors, easy to deduce from their examples). We also provide an implementation of the Hadoop Writable interface for easy use with MapReduce. 
+In addition to the features described above, this library adds the ability to do many-way intersections between sets, a new feature not described in the original paper (though, credit to the authors, easy to deduce from their examples).
 
 ## Demo Usage
 
