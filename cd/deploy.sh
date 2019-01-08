@@ -9,5 +9,5 @@
   rm cd/codesigning.asc || exit 1;
 
   # run the deploy phase and sign any artifacts
-  mvn deploy -P sign,build-src-and-docs -DskipTests=true --settings cd/mvnsettings.xml
+  mvn deploy -P sign,build-src-and-docs -DskipTests=true --settings cd/mvnsettings.xml -X 
 #fi
