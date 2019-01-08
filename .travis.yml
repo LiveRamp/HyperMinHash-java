@@ -5,13 +5,12 @@ jdk: oraclejdk8
 # This just runs the command "true" in the install phase which doesn't do much of anything.
 install: true
 
-# Script phase installs any deps and runs tests
-script: mvn clean install test -P-build-src-and-docs -B -V
+script:
+  # First install any deps and runs tests
+  - mvn clean install test -P-build-src-and-docs -B -V
+  # If successful, run the deploy script to publish produced artifacts
+  - ./cd/deploy.sh
 
 cache:
   directories:
     - ~/.m2/repository
-
-after_success:
-  - ./cd/deploy.sh
-
