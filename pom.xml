@@ -4,15 +4,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <groupId>com.liveramp</groupId>
   <artifactId>hyperminhash</artifactId>
   <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
-
-  <parent>
-    <groupId>com.liveramp</groupId>
-    <artifactId>pom-common</artifactId>
-    <version>1.5</version>
-  </parent>
 
   <name>${project.groupId}:${project.artifactId}</name>
   <description>
@@ -22,12 +17,31 @@
   </description>
   <url>www.github.com/LiveRamp/HyperMinHash-java</url>
 
+  <organization>
+    <name>LiveRamp</name>
+    <url>www.liveramp.com</url>
+  </organization>
+
+  <licenses>
+    <license>
+      <name>Apache 2</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
   <scm>
     <connection>scm:git:git@github.com:LiveRamp/HyperMinHash-java.git</connection>
     <url>scm:git:git@github.com:LiveRamp/HyperMinHash-java.git</url>
     <developerConnection>scm:git:git@github.com:LiveRamp/HyperMinHash-java.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
+
+  <issueManagement>
+    <system>Github</system>
+    <url>www.github.com/LiveRamp/HyperMinHash-java</url>
+  </issueManagement>
+
 
   <developers>
     <developer>
@@ -86,31 +100,104 @@
     </plugins>
   </build>
 
+  <profiles>
+    <!-- Used to sign artifacts with our GPG key, as required by Sona Type. -->
+    <profile>
+      <id>sign</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>build-src-and-docs</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+
+      <build>
+
+        <plugins>
+          <!-- Used to build a JAR containing the source code from this project -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.4</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- Used to generate javadocs for this project -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.10.4</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+
+      </build>
+    </profile>
+
+  </profiles>
+
   <dependencies>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-common</artifactId>
-      <version>${hadoop.version}</version>
-    </dependency>
+    <!-- Use metrohash for convenient & fast 128 bit hashing functions -->
     <dependency>
       <groupId>com.adgear</groupId>
       <artifactId>metrohash</artifactId>
       <version>1.0.0</version>
     </dependency>
+
+    <!-- Use Junit even though our code has no bugs ;) -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.12</version>
+      <scope>test</scope>
     </dependency>
+
   </dependencies>
+
   <distributionManagement>
-    <!--
-    Snapshots should be released to this repository on Sonatype. The parent POM contains the URL
-    for the release repository, and its ID should be "ossrh".
-    -->
+
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+
     <repository>
-      <id>ossrh-snapshots</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
+
   </distributionManagement>
 </project>
