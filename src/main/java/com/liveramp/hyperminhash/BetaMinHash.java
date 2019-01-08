@@ -18,7 +18,7 @@ import java.nio.ByteBuffer;
  * Similarly, we use values of Q and R suggested in the HyperMinHash paper. Those are theoretically changeable, but the
  * current values should provide sufficient accuracy for set cardinalities up to 2^89 (see Hyperminhash paper for
  * reference).
- * <p>
+ *
  * If you'd like this class to support custom Q or R or P values, please open a github issue.
  */
 public class BetaMinHash {
