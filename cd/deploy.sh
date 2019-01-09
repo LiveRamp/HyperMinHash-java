@@ -26,6 +26,6 @@
 
   # Run the deploy phase (which will sign any artifacts). The build will use the GPG certs we
   # imported above
-  mvn deploy -P sign,build-src-and-docs -DskipTests=true --settings cd/mvnsettings.xml
+  mvn deploy -P sign,build-src-and-docs -DskipTests=true --settings "${TRAVIS_BUILD_DIR}/cd/mvnsettings.xml"
 #fi TODO comment back in
 
