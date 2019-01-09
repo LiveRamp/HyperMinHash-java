@@ -131,7 +131,9 @@
       </build>
     </profile>
 
-    <!-- Used to generate a stand-alone JAR which includes all dependencies -->
+    <!-- Used to generate a stand-alone JAR which includes all dependencies. Note that even though
+     we're using the shading plugin, we're not actually renaming any dependencies. We're only
+     using the shading plugin's capability to create an uber jar. -->
     <profile>
       <id>uberjar</id>
       <build>
