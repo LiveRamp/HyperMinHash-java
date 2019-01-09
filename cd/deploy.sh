@@ -2,7 +2,6 @@
 
 # TODO comment this back in
 #if [ "$TRAVIS_BRANCH" = 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
-
   CERT_DIR="${TRAVIS_BUILD_DIR}/cd/codesigning.asc";
 
   # This block unencrypts GPG signing keys and imports them into the build environment so they
