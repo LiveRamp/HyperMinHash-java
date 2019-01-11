@@ -4,11 +4,11 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestBetaMinHash {
+public class TestHyperMinHash {
 
   @Test
   public void testZeroCardinality() {
-    BetaMinHash sk = new BetaMinHash();
+    HyperMinHash sk = new HyperMinHash(14, 35);
     assertEquals(0, sk.cardinality());
   }
 
@@ -20,7 +20,7 @@ public class TestBetaMinHash {
     RandomTestRunner.runRandomizedTest(
         3,
         (random) -> CommonTests.testCardinality(
-            new BetaMinHash(),
+            new HyperMinHash(14, 35),
             maxUniqueElements,
             minTestCardinality,
             random,
@@ -30,14 +30,14 @@ public class TestBetaMinHash {
 
   @Test
   public void testUnion() {
-    final BetaMinHashCombiner combiner = BetaMinHashCombiner.getInstance();
+    final HyperMinHashCombiner combiner = HyperMinHashCombiner.getInstance();
     final int elementsPerSketch = 1_500_000;
     final double pctErr = 2.0;
     RandomTestRunner.runRandomizedTest(
         3,
         (random) -> CommonTests.testUnion(
-            new BetaMinHash(),
-            new BetaMinHash(),
+            new HyperMinHash(14, 35),
+            new HyperMinHash(14, 35),
             combiner,
             elementsPerSketch,
             pctErr,
@@ -52,8 +52,8 @@ public class TestBetaMinHash {
     final int numElementsLeftSketch = 1_000_000;
     final double pctError = 5.0;
     CommonTests.testIntersection(
-        new BetaMinHash(),
-        BetaMinHashCombiner.getInstance(),
+        new HyperMinHash(14, 35),
+        HyperMinHashCombiner.getInstance(),
         overlapSlices,
         numElementsLeftSketch,
         pctError
@@ -62,14 +62,35 @@ public class TestBetaMinHash {
   }
 
   @Test
-  public void testIntersectLargeSetWithSmallSet() {
+  public void testIntersectionWithSmallJaccard() {
+    // .001 Jaccard
     int smallSetSize = 1_000;
     int bigSetSize = 1_000_000;
     for (int i = 0; i < 3; i++) {
-      final double maxPctErr = 22.0;
+      final double maxPctErr = 20.0;
       CommonTests.testIntersectLargeSetWithSmall(
-          new BetaMinHash(),
-          BetaMinHashCombiner.getInstance(),
+          new HyperMinHash(14, 57),
+          HyperMinHashCombiner.getInstance(),
+          smallSetSize,
+          bigSetSize,
+          maxPctErr
+      );
+      smallSetSize *= 10;
+      bigSetSize *= 10;
+    }
+  }
+
+  @Test
+  public void testIntersectionWithExtremelySmallJaccard() {
+    // .0001 Jaccard
+    int smallSetSize = 1_000;
+    int bigSetSize = 10_000_000;
+    for (int i = 0; i < 2; i++) {
+      final double maxPctErr = 20.0;
+      CommonTests.testIntersectLargeSetWithSmall(
+          // make a beefy sketch since we're asking for a lot here
+          new HyperMinHash(21, 57),
+          HyperMinHashCombiner.getInstance(),
           smallSetSize,
           bigSetSize,
           maxPctErr
@@ -85,25 +106,11 @@ public class TestBetaMinHash {
     final int initialSketchSize = 10_000;
     final int numIter = 5;
     CommonTests.testMultiwayIntersection(
-        new BetaMinHash(),
-        BetaMinHashCombiner.getInstance(),
+        new HyperMinHash(14, 35),
+        HyperMinHashCombiner.getInstance(),
         initialSketchSize,
         initialIntersectionSize,
         numIter
     );
-
   }
-
-  @Test
-  public void testToFromBytes() {
-    final BetaMinHash original = new BetaMinHash();
-    original.offer("test data".getBytes());
-
-//    final byte[] serialized = original.getBytes();
-//    final BetaMinHash deSerialized = BetaMinHash.fromBytes(serialized);
-
-//    Assert.assertEquals(original, deSerialized);
-  }
-
-
 }

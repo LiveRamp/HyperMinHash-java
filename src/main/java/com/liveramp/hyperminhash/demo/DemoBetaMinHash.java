@@ -1,14 +1,18 @@
 package com.liveramp.hyperminhash.demo;
 
+import com.liveramp.hyperminhash.BetaMinHash;
+import com.liveramp.hyperminhash.BetaMinHashCombiner;
+import com.liveramp.hyperminhash.IntersectionSketch;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import com.liveramp.hyperminhash.BetaMinHash;
-
 public class DemoBetaMinHash {
+
   private static final int NUM_THREADS = 15;
   private static ExecutorService threadPool = Executors.newFixedThreadPool(NUM_THREADS);
   private static Random rng = new Random();
@@ -35,18 +39,22 @@ public class DemoBetaMinHash {
     System.out.println(getFormattedHeader(numSketchesToBuild));
     for (long order = 1_000_000_000; order <= 1_000_000_000; order *= 10) {
       for (int i = 1; i <= 10; i++) {
-        for (double jaccardIndex = 0.00_000_000_001; jaccardIndex < 0.0_000_001; jaccardIndex *= 10) {
+        for (double jaccardIndex = 0.00_000_000_001; jaccardIndex < 0.0_000_001;
+            jaccardIndex *= 10) {
           for (int j = 1; j <= 10; j++) {
             double jac = jaccardIndex * j;
             long unionSize = plusMinusThreePercent(order * i);
-            long intersectionSize = (long)(jac * unionSize);
+            long intersectionSize = (long) (jac * unionSize);
 
             if (intersectionSize <= 0) {
               continue;
             }
-            long sketchSize = (long)((unionSize - intersectionSize) / (double)numSketchesToBuild) + intersectionSize;
+            long sketchSize = (long) ((unionSize - intersectionSize) / (double) numSketchesToBuild)
+                + intersectionSize;
             //            runTestIteration(intersectionSize, getSketchSizes(numSketchesToBuild, sketchSize))
-            threadPool.submit(() -> runTestIteration(intersectionSize, getSketchSizes(numSketchesToBuild, sketchSize)));
+            threadPool.submit(() -> runTestIteration(
+                intersectionSize,
+                getSketchSizes(numSketchesToBuild, sketchSize)));
           }
         }
       }
@@ -54,32 +62,34 @@ public class DemoBetaMinHash {
   }
 
   private static void runTestIteration(long exactIntersectionSize, long... sketchSizes) {
-    BetaMinHash[] sketches = buildIntersectingSketches(exactIntersectionSize, sketchSizes);
+    final List<BetaMinHash> sketches = buildIntersectingSketches(
+        exactIntersectionSize,
+        sketchSizes);
+    final BetaMinHashCombiner combiner = BetaMinHashCombiner.getInstance();
 
     StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < sketches.length; i++) {
+    for (int i = 0; i < sketches.size(); i++) {
       // hack
       sb.append(sketchSizes[i] + ", ");
-      sb.append(sketches[i].cardinality() + ", ");
+      sb.append(sketches.get(i).cardinality() + ", ");
     }
 
     long exactUnionSize = sum(sketchSizes) - ((sketchSizes.length - 1) * exactIntersectionSize);
 
     sb.append(exactUnionSize + ", ");
-    sb.append(BetaMinHash.union(sketches) + ", ");
+    sb.append(combiner.union(sketches).cardinality() + ", ");
 
     sb.append(exactIntersectionSize + ", ");
-    sb.append(BetaMinHash.intersection(sketches) + ", ");
+    sb.append(combiner.intersectionCardinality(sketches) + ", ");
 
     // jaccard
-    sb.append(exactIntersectionSize / (double)exactUnionSize + ", ");
-    if (exactIntersectionSize / (double)exactUnionSize < 0) {
+    sb.append(exactIntersectionSize / (double) exactUnionSize + ", ");
+    if (exactIntersectionSize / (double) exactUnionSize < 0) {
       System.out.println("oh boy");
       throw new RuntimeException();
     }
 
-
-    sb.append(BetaMinHash.similarity(sketches));
+    sb.append(combiner.similarity(sketches));
     System.out.println(sb.toString());
   }
 
@@ -95,25 +105,27 @@ public class DemoBetaMinHash {
   /**
    * The sum of sketch sizes can't be larger than Long.MAX_VALUE
    */
-  private static BetaMinHash[] buildIntersectingSketches(long intersectionSize, long... sketchSizes) {
-    BetaMinHash[] out = new BetaMinHash[sketchSizes.length];
-    for (int i = 0; i < out.length; i++) {
-      out[i] = new BetaMinHash();
+  private static List<BetaMinHash> buildIntersectingSketches(
+      long intersectionSize,
+      long... sketchSizes) {
+    final List<BetaMinHash> out = new ArrayList<>();
+    for (int i = 0; i < sketchSizes.length; i++) {
+      out.add(new BetaMinHash());
     }
 
     long counter = 0;
     // add intersecting items
     for (int i = 0; i < intersectionSize; i++) {
       byte[] val = (counter++ + "").getBytes();
-      for (BetaMinHash sketch : out) {
-        sketch.add(val);
+      for (IntersectionSketch sketch : out) {
+        sketch.offer(val);
       }
 
     }
     // add disjoint items
     for (int i = 0; i < sketchSizes.length; i++) {
       for (int j = 0; j < (sketchSizes[i] - intersectionSize); j++) {
-        out[i].add((counter++ + "").getBytes());
+        out.get(i).offer((counter++ + "").getBytes());
       }
     }
     return out;
@@ -170,6 +182,6 @@ public class DemoBetaMinHash {
 
   private static long plusMinusThreePercent(long x) {
     double pct = (rng.nextInt() % 3.1) / 100.0;
-    return (long)((1 + pct) * x);
+    return (long) ((1 + pct) * x);
   }
 }
