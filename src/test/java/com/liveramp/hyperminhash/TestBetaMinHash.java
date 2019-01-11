@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class TestBetaMinHash {
 
@@ -18,6 +17,7 @@ public class TestBetaMinHash {
 
   @Test
   public void testCardinality() {
+<<<<<<< HEAD:src/test/java/com/liveramp/hyperminhash/TestBetaMinHash.java
     BetaMinHash sk = new BetaMinHash();
     int step = 10_000;
     Map<String, Boolean> unique = new HashMap<>();
@@ -35,34 +35,42 @@ public class TestBetaMinHash {
         assertTrue(pctError <= 2.5);
       }
     }
+=======
+    final int maxUniqueElements = 10_000_000;
+    final int minTestCardinality = 10_000;
+    final double pctErr = 2.0;
+    RandomTestRunner.runRandomizedTest(
+        3,
+        (random) -> CommonTests.testCardinality(
+            new BetaMinHash(),
+            maxUniqueElements,
+            minTestCardinality,
+            random,
+            pctErr)
+    );
+>>>>>>> d3e26e8c42647e7aae2a4e91eb6941d3ad206ab0:test/main/java/com/liveramp/hyperminhash/TestBetaMinHash.java
   }
 
   @Test
-  public void testMerge() {
-    BetaMinHash sk1 = new BetaMinHash();
-    BetaMinHash sk2 = new BetaMinHash();
-
-    Set<String> unique = new HashSet<>(3_500_000);
-
-    for (int i = 1; i <= 1_500_000; i++) {
-      String str = randomStringWithLength(randPositiveInt() % 32);
-      sk1.add(str.getBytes());
-      unique.add(str);
-
-      str = randomStringWithLength(randPositiveInt() % 32);
-      sk2.add(str.getBytes());
-      unique.add(str);
-    }
-
-    BetaMinHash msk = BetaMinHash.merge(sk1, sk2);
-    long exact = unique.size();
-    long res = msk.cardinality();
-
-    double pctError = 100 * getError(res, exact);
-    assertTrue(pctError <= 2);
+  public void testUnion() {
+    final BetaMinHashCombiner combiner = BetaMinHashCombiner.getInstance();
+    final int elementsPerSketch = 1_500_000;
+    final double pctErr = 2.0;
+    RandomTestRunner.runRandomizedTest(
+        3,
+        (random) -> CommonTests.testUnion(
+            new BetaMinHash(),
+            new BetaMinHash(),
+            combiner,
+            elementsPerSketch,
+            pctErr,
+            random
+        )
+    );
   }
 
   @Test
+<<<<<<< HEAD:src/test/java/com/liveramp/hyperminhash/TestBetaMinHash.java
   public void testIntersection() {
     int iters = 20;
     int k = 1_000_000;
@@ -94,38 +102,24 @@ public class TestBetaMinHash {
               pctError),
           pctError <= expectedPctError);
     }
+=======
+  public void testIntersectionCardinality() {
+    final int overlapSlices = 20;
+    final int numElementsLeftSketch = 1_000_000;
+    final double pctError = 5.0;
+    CommonTests.testIntersection(
+        new BetaMinHash(),
+        BetaMinHashCombiner.getInstance(),
+        overlapSlices,
+        numElementsLeftSketch,
+        pctError
+    );
+
+>>>>>>> d3e26e8c42647e7aae2a4e91eb6941d3ad206ab0:test/main/java/com/liveramp/hyperminhash/TestBetaMinHash.java
   }
 
-  //  @Test
-  //  public void testIntersectLargeSetWithSmallSet() {
-  //    // Our other test uses string, which puts an upper bound on how big that test can be due to GC errors. With numbers
-  //    // we can estimate cardinalities on the order of billions without running out of memory, unlike strings.
-  //    BetaMinHash smallSketch = new BetaMinHash();
-  //    long smallSetSize = 100_000;
-  //    for (int i = 1; i < smallSetSize; i++) {
-  //      smallSketch.add((i + "").getBytes());
-  //    }
-  //
-  //    BetaMinHash bigSketch = new BetaMinHash();
-  //    long bigSetSize = 100_000_000;
-  //    for (long i = 1; i <= bigSetSize; i++) {
-  //      bigSketch.add((i + "").getBytes());
-  //    }
-  //
-  //    double expectedJaccardIndex = smallSetSize / (double)bigSetSize;
-  //    long expectedIntersection = (long)(expectedJaccardIndex * bigSetSize);
-  //    long actualIntersection = BetaMinHash.intersection(smallSketch, bigSketch);
-  //    double pctError = 100 * getError(actualIntersection, expectedIntersection);
-  //
-  //    // HyperMinHash performance starts decreasing as jaccard index becomes < 1%. On a Jaccard index this small
-  //    // we should hope for <100% error.
-  //    assertTrue(
-  //        String.format("Percent error for a small jaccard index (%s) should be less than 100, but found %f", expectedJaccardIndex, pctError),
-  //        pctError < 100
-  //    );
-  //  }
-
   @Test
+<<<<<<< HEAD:src/test/java/com/liveramp/hyperminhash/TestBetaMinHash.java
   public void testManyWayIntersection() {
 
     long intersectionSize = 3000;
@@ -180,17 +174,49 @@ public class TestBetaMinHash {
     byte[] b = new byte[n];
     rng.nextBytes(b);
     return new String(b, StandardCharsets.US_ASCII);
+=======
+  public void testIntersectLargeSetWithSmallSet() {
+    int smallSetSize = 1_000;
+    int bigSetSize = 1_000_000;
+    for (int i = 0; i < 3; i++) {
+      final double maxPctErr = 22.0;
+      CommonTests.testIntersectLargeSetWithSmall(
+          new BetaMinHash(),
+          BetaMinHashCombiner.getInstance(),
+          smallSetSize,
+          bigSetSize,
+          maxPctErr
+      );
+      smallSetSize *= 10;
+      bigSetSize *= 10;
+    }
   }
 
-  private double getError(long result, long expected) {
-    if (result == expected) {
-      return 0;
-    }
+  @Test
+  public void testMultiwayIntersection() {
+    final int initialIntersectionSize = 3000;
+    final int initialSketchSize = 10_000;
+    final int numIter = 5;
+    CommonTests.testMultiwayIntersection(
+        new BetaMinHash(),
+        BetaMinHashCombiner.getInstance(),
+        initialSketchSize,
+        initialIntersectionSize,
+        numIter
+    );
 
-    if (expected == 0) {
-      return result;
-    }
+>>>>>>> d3e26e8c42647e7aae2a4e91eb6941d3ad206ab0:test/main/java/com/liveramp/hyperminhash/TestBetaMinHash.java
+  }
 
+  @Test
+  public void testToFromBytes() {
+    final BetaMinHash original = new BetaMinHash();
+    original.offer("test data".getBytes());
+
+//    final byte[] serialized = original.getBytes();
+//    final BetaMinHash deSerialized = BetaMinHash.fromBytes(serialized);
+
+<<<<<<< HEAD:src/test/java/com/liveramp/hyperminhash/TestBetaMinHash.java
     long delta = Math.abs(result - expected);
     return delta / (double) expected;
   }
@@ -198,4 +224,10 @@ public class TestBetaMinHash {
   int randPositiveInt() {
     return Math.abs(rng.nextInt());
   }
+=======
+//    Assert.assertEquals(original, deSerialized);
+  }
+
+
+>>>>>>> d3e26e8c42647e7aae2a4e91eb6941d3ad206ab0:test/main/java/com/liveramp/hyperminhash/TestBetaMinHash.java
 }

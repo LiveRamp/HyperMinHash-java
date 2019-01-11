@@ -203,14 +203,6 @@
   </profiles>
 
   <dependencies>
-    <!-- Use metrohash for convenient & fast 128 bit hashing functions -->
-    <dependency>
-      <groupId>com.adgear</groupId>
-      <artifactId>metrohash</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-
-    <!-- Use Junit even though our code has no bugs ;) -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -218,6 +210,11 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-math3</artifactId>
+      <version>3.4.1</version>
+    </dependency>
   </dependencies>
 
   <distributionManagement>
