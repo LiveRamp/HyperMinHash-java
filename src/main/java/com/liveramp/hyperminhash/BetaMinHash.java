@@ -105,20 +105,6 @@ public class BetaMinHash implements IntersectionSketch<BetaMinHash> {
     return addHash(buf);
   }
 
-//  @Override
-//  public int sizeInBytes() {
-//    return NUM_REGISTERS * Short.BYTES;
-//  }
-//
-//  @Override
-//  public byte[] getBytes() {
-//    ByteBuffer byteBuffer = ByteBuffer.allocate(sizeInBytes());
-//    for (short s : registers) {
-//      byteBuffer.putShort(s);
-//    }
-//    return byteBuffer.array();
-//  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
