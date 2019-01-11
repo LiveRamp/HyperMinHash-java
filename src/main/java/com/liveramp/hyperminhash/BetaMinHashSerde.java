@@ -12,8 +12,6 @@ public class BetaMinHashSerde implements IntersectionSketch.SerDe<BetaMinHash> {
       serde token (byte)
       version (byte)
       registers (NUM_REGISTERS * short)
-
-
    */
   @Override
   public BetaMinHash fromBytes(byte[] bytes) {
@@ -53,10 +51,6 @@ public class BetaMinHashSerde implements IntersectionSketch.SerDe<BetaMinHash> {
   public int sizeInBytes(BetaMinHash sketch) {
     return Byte.BYTES + // serde token
         Byte.BYTES + // version
-        Integer.BYTES + // p
-        Integer.BYTES + // q
-        Integer.BYTES + // r
-        Integer.BYTES + // num registers
         NUM_REGISTERS * Short.BYTES; // size of registers
   }
 }
