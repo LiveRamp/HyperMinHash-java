@@ -53,26 +53,6 @@ public class BetaMinHash implements IntersectionSketch<BetaMinHash> {
     this.registers = registers;
   }
 
-  /**
-   * Create a BetaMinHash from the serialized representation returned by {@link #getBytes()}.
-   */
-  public static BetaMinHash wrapRegisters(byte[] bytes) {
-    final int expectedNumBytes = 2 * NUM_REGISTERS; // 2 bytes per short
-    if (bytes.length != expectedNumBytes) {
-      throw new IllegalArgumentException(String.format(
-          "Expected exactly %d bytes, but there are %d",
-          expectedNumBytes,
-          bytes.length));
-    }
-
-    final ByteBuffer buffer = ByteBuffer.wrap(bytes);
-    final short[] registers = new short[NUM_REGISTERS];
-    for (int i = 0; i < NUM_REGISTERS; i++) {
-      registers[i] = buffer.getShort();
-    }
-
-    return wrapRegisters(registers);
-  }
 
   static BetaMinHash deepCopyFromRegisters(short[] registers) {
     if (registers.length != NUM_REGISTERS) {

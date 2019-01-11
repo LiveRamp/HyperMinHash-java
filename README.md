@@ -34,9 +34,17 @@ long estimatedCardinality = sketch.cardinality();
 
 ### Merging (unioning) sketches
 ```
-BetaMinHash[] sketches = getSketches();
-SketchCombiner<BetaMinHash> combiner = BetaMinHashComber.getInstance();
+Collection<BetaMinHash> sketches = getSketches();
+SketchCombiner<BetaMinHash> combiner = BetaMinHashCombiner.getInstance();
 BetaMinHash combined = combiner.union(sketches);
+
+// to get cardinality of the union
+long unionCardinality = combined.cardinality();
+
+// using HyperMinHash instead of BetaMinHash
+Collection<HyperMinHash> sketches = getSketches();
+SketchCombiner<HyperMinHash> combiner = HyperMinHashCombinre.getInstance();
+HyperMinHash combined = combiner.union(sketches);
 ```
 
 ### Cardinality of unions
@@ -47,7 +55,7 @@ long estimatedCardinality = combined.cardinality();
 
 ### Cardinality of intersection
 ```
-BetaMinHash[] sketches = getSketches();
+Collection<BetaMinHash> sketches = getSketches();
 SketchCombiner<BetaMinHash> combiner = BetaMinHashComber.getInstance();
 long intersectionCardinality = combiner.intersectionCardinality(sketches);
 ```
@@ -55,5 +63,5 @@ long intersectionCardinality = combiner.intersectionCardinality(sketches);
 ## Acknowledgements
 Thanks to Seif Lotfy for implementing a
 [Golang version of HyperMinHash](http://github.com/axiomhq/hyperminhash).
-We use some of his tests in our library, and the decision to use
-LogLog-Beta was due to the example he set.
+We use some of his tests in our library, and our BetaMinHash implementation
+references his implementation.
