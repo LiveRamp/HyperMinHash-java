@@ -18,6 +18,10 @@ estimations for small datasets (n <= 200k). Since we use Loglog-Beta,
 we refer to our implementation as BetaMinHash. However, our implementation
 currently only supports a fixed precision `p=14`.
 
+Both implementations are equipped with serialization/deserialization
+capabilities out of the box for sending sketches over the wire or
+persisting them to disk.
+
 ## Demo Usage
 
 ### Cardinality estimation
@@ -58,6 +62,13 @@ long estimatedCardinality = combined.cardinality();
 Collection<BetaMinHash> sketches = getSketches();
 SketchCombiner<BetaMinHash> combiner = BetaMinHashComber.getInstance();
 long intersectionCardinality = combiner.intersectionCardinality(sketches);
+```
+
+### Serializing a sketch
+To get a byte[] representation of a sketch, use the `IntersectionSketch.SerDe` interface:
+```
+HyperMinHash sketch = new
+HyperMinHashSerde serde = new HyperMinHashSerde();
 ```
 
 ## Acknowledgements
