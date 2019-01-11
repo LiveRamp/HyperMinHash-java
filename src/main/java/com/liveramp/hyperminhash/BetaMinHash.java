@@ -1,9 +1,9 @@
-package com.liveramp.hyperminhash.betaminhash;
+package com.liveramp.hyperminhash;
 
-import com.liveramp.hyperminhash.IntersectionSketch;
+import util.hash.MetroHash128;
+
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import util.hash.MetroHash128;
 
 /**
  * Implementation of HyperMinHash described in Yu and Weber: https://arxiv.org/pdf/1710.08436.pdf.
@@ -29,7 +29,7 @@ import util.hash.MetroHash128;
  * If you'd like this class to support custom Q or R or P values, please open a github issue.
  * <p>
  */
-public class BetaMinHash implements IntersectionSketch {
+public class BetaMinHash implements IntersectionSketch<BetaMinHash> {
 
   // HLL Precision parameter
   public static final int P = 14;
@@ -41,6 +41,8 @@ public class BetaMinHash implements IntersectionSketch {
   public static final int Q = 6;
   public static final int R = 10;
 
+  private static final int HASH_SEED = 1337;
+
   final short[] registers;
 
   public BetaMinHash() {
@@ -49,13 +51,6 @@ public class BetaMinHash implements IntersectionSketch {
 
   private BetaMinHash(short[] registers) {
     this.registers = registers;
-  }
-
-  /**
-   * Create a deep copy of another {@link BetaMinHash}.
-   */
-  public static BetaMinHash deepCopy(BetaMinHash other) {
-    return deepCopyFromRegisters(other.registers);
   }
 
   /**
@@ -104,25 +99,25 @@ public class BetaMinHash implements IntersectionSketch {
 
   @Override
   public boolean offer(byte[] val) {
-    MetroHash128 hash = new MetroHash128(1337).apply(ByteBuffer.wrap(val));
+    MetroHash128 hash = new MetroHash128(HASH_SEED).apply(ByteBuffer.wrap(val));
     ByteBuffer buf = ByteBuffer.allocate(16);
     hash.writeBigEndian(buf);
     return addHash(buf);
   }
 
-  @Override
-  public int sizeInBytes() {
-    return NUM_REGISTERS * Short.BYTES;
-  }
-
-  @Override
-  public byte[] getBytes() {
-    ByteBuffer byteBuffer = ByteBuffer.allocate(sizeInBytes());
-    for (short s : registers) {
-      byteBuffer.putShort(s);
-    }
-    return byteBuffer.array();
-  }
+//  @Override
+//  public int sizeInBytes() {
+//    return NUM_REGISTERS * Short.BYTES;
+//  }
+//
+//  @Override
+//  public byte[] getBytes() {
+//    ByteBuffer byteBuffer = ByteBuffer.allocate(sizeInBytes());
+//    for (short s : registers) {
+//      byteBuffer.putShort(s);
+//    }
+//    return byteBuffer.array();
+//  }
 
   @Override
   public boolean equals(Object o) {
@@ -141,6 +136,11 @@ public class BetaMinHash implements IntersectionSketch {
     return Arrays.hashCode(registers);
   }
 
+  @Override
+  public BetaMinHash deepCopy() {
+    return deepCopyFromRegisters(this.registers);
+  }
+
   /**
    * @param _128BitHash
    */
@@ -150,12 +150,14 @@ public class BetaMinHash implements IntersectionSketch {
     }
 
     long hashLeftHalf = _128BitHash.getLong(0);
-    long hashRightHalf = _128BitHash.getLong(8);
-
-    int registerIndex = getLeftmostPBits(hashLeftHalf);
-    short rBits = getRightmostRBits(hashLeftHalf);
-
-    byte leftmostOneBitPosition = getLeftmostOneBitPosition(hashRightHalf);
+    int registerIndex = (int) BitHelper.getLeftmostBits(hashLeftHalf, P);
+    short leftmostOneBitPosition = BitHelper.getLeftmostOneBitPosition(_128BitHash.array(), P, Q);
+    /* We take the rightmost bits as what's called h_hat3 in the paper. Note that his differs from
+     * the diagram in the paper which draws a parallel to a mantissa in a floating point
+     * representation, but still satisfies the criterion of serving as an independent hash function
+     * by selecting a set of independent bits from a larger hash. This is slightly simpler to
+     * implement. */
+    short rBits = (short) BitHelper.getRightmostBits(_128BitHash.array(), R);
 
     short packedRegister = packIntoRegister(leftmostOneBitPosition, rBits);
     if (registers[registerIndex] < packedRegister) {
@@ -166,41 +168,15 @@ public class BetaMinHash implements IntersectionSketch {
     return false;
   }
 
-  private int getLeftmostPBits(long hash) {
-    return (int) (hash >>> (Long.SIZE - P));
-  }
-
-  /**
-   * Finds the position of the leftmost one-bit in the first (2^Q)-1 bits.
-   */
-  private byte getLeftmostOneBitPosition(long hash) {
-    // To find the position of the leftmost 1-bit in the first (2^Q)-1 bits
-    // We zero out all bits to the right of the first (2^Q)-1 bits then add a
-    // 1-bit in the 2^Qth position of the bits to search. This way if the bits we're
-    // searching are all 0, we take the position of the leftmost 1-bit to be 2^Q
-    int _2q = (1 << Q) - 1;
-    int shiftAmount = (Long.SIZE - _2q);
-
-    // zero all bits to the right of the first (2^Q)-1 bits
-    long _2qSearchBits = ((hash >>> shiftAmount) << shiftAmount);
-
-    // add a 1-bit in the 2^Qth position
-    _2qSearchBits += (1 << (shiftAmount - 1));
-
-    return (byte) (Long.numberOfLeadingZeros(_2qSearchBits) + 1);
-  }
-
-  private short getRightmostRBits(long hash) {
-    return (short) (hash << (Long.SIZE - R) >>> Long.SIZE - R);
-  }
-
   /**
    * Creates a new tuple/register value for the LL-Beta by bit-packing the number of leading zeros
    * with the rightmost R bits.
    */
-  private short packIntoRegister(byte leftmostOnebitPosition, short rightmostRBits) {
+  private short packIntoRegister(short leftmostOnebitPosition, short rightmostRBits) {
     // Q is at most 6, which means that with R<=10, we should be able to store these two
     // numbers in the same register
-    return (short) ((leftmostOnebitPosition << R) | rightmostRBits);
+    final int exponent = leftmostOnebitPosition << R;
+    final int packedRegister = (exponent | rightmostRBits);
+    return (short) packedRegister;
   }
 }

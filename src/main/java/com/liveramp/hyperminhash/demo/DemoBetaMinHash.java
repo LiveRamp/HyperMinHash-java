@@ -1,8 +1,11 @@
 package com.liveramp.hyperminhash.demo;
 
-import com.liveramp.hyperminhash.betaminhash.BetaMinHash;
-import com.liveramp.hyperminhash.betaminhash.BetaMinHashCombiner;
+import com.liveramp.hyperminhash.BetaMinHash;
+import com.liveramp.hyperminhash.BetaMinHashCombiner;
+import com.liveramp.hyperminhash.IntersectionSketch;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -59,14 +62,16 @@ public class DemoBetaMinHash {
   }
 
   private static void runTestIteration(long exactIntersectionSize, long... sketchSizes) {
-    final BetaMinHash[] sketches = buildIntersectingSketches(exactIntersectionSize, sketchSizes);
+    final List<BetaMinHash> sketches = buildIntersectingSketches(
+        exactIntersectionSize,
+        sketchSizes);
     final BetaMinHashCombiner combiner = BetaMinHashCombiner.getInstance();
 
     StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < sketches.length; i++) {
+    for (int i = 0; i < sketches.size(); i++) {
       // hack
       sb.append(sketchSizes[i] + ", ");
-      sb.append(sketches[i].cardinality() + ", ");
+      sb.append(sketches.get(i).cardinality() + ", ");
     }
 
     long exactUnionSize = sum(sketchSizes) - ((sketchSizes.length - 1) * exactIntersectionSize);
@@ -100,19 +105,19 @@ public class DemoBetaMinHash {
   /**
    * The sum of sketch sizes can't be larger than Long.MAX_VALUE
    */
-  private static BetaMinHash[] buildIntersectingSketches(
+  private static List<BetaMinHash> buildIntersectingSketches(
       long intersectionSize,
       long... sketchSizes) {
-    BetaMinHash[] out = new BetaMinHash[sketchSizes.length];
-    for (int i = 0; i < out.length; i++) {
-      out[i] = new BetaMinHash();
+    final List<BetaMinHash> out = new ArrayList<>();
+    for (int i = 0; i < sketchSizes.length; i++) {
+      out.add(new BetaMinHash());
     }
 
     long counter = 0;
     // add intersecting items
     for (int i = 0; i < intersectionSize; i++) {
       byte[] val = (counter++ + "").getBytes();
-      for (BetaMinHash sketch : out) {
+      for (IntersectionSketch sketch : out) {
         sketch.offer(val);
       }
 
@@ -120,7 +125,7 @@ public class DemoBetaMinHash {
     // add disjoint items
     for (int i = 0; i < sketchSizes.length; i++) {
       for (int j = 0; j < (sketchSizes[i] - intersectionSize); j++) {
-        out[i].offer((counter++ + "").getBytes());
+        out.get(i).offer((counter++ + "").getBytes());
       }
     }
     return out;

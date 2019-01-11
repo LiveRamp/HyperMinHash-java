@@ -1,4 +1,4 @@
-package com.liveramp.hyperminhash.betaminhash;
+package com.liveramp.hyperminhash;
 
 class BetaMinHashCardinalityGetter {
 

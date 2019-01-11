@@ -1,6 +1,6 @@
-package com.liveramp.hyperminhash.betaminhash;
+package com.liveramp.hyperminhash;
 
-import com.liveramp.hyperminhash.SketchCombiner;
+import java.util.Collection;
 
 public class BetaMinHashCombiner implements SketchCombiner<BetaMinHash> {
 
@@ -15,18 +15,20 @@ public class BetaMinHashCombiner implements SketchCombiner<BetaMinHash> {
   }
 
   @Override
-  public final BetaMinHash union(BetaMinHash... sketches) {
-    if (sketches.length == 0) {
+  public final BetaMinHash union(Collection<BetaMinHash> sketches) {
+    if (sketches.isEmpty()) {
       throw new IllegalArgumentException("Input sketches cannot be empty.");
     }
 
-    if (sketches.length == 1) {
-      return BetaMinHash.deepCopy(sketches[0]);
+    final BetaMinHash firstSketch = sketches.stream()
+        .findFirst()
+        .get();
+    if (sketches.size() == 1) {
+      return firstSketch.deepCopy();
     }
 
-    int numRegisters = sketches[0].registers.length;
-
-    BetaMinHash mergedSketch = BetaMinHash.deepCopy(sketches[0]);
+    final int numRegisters = firstSketch.registers.length;
+    final BetaMinHash mergedSketch = firstSketch.deepCopy();
     for (int i = 0; i < numRegisters; i++) {
       for (BetaMinHash sketch : sketches) {
         mergedSketch.registers[i] = max(
@@ -40,8 +42,8 @@ public class BetaMinHashCombiner implements SketchCombiner<BetaMinHash> {
   }
 
   @Override
-  public long intersectionCardinality(BetaMinHash... sketches) {
-    if (sketches.length == 0) {
+  public long intersectionCardinality(Collection<BetaMinHash> sketches) {
+    if (sketches.size() == 0) {
       throw new IllegalArgumentException("Input sketches cannot be empty.");
     }
 
@@ -49,24 +51,27 @@ public class BetaMinHashCombiner implements SketchCombiner<BetaMinHash> {
   }
 
   @Override
-  public double similarity(BetaMinHash... sketches) {
+  public double similarity(Collection<BetaMinHash> sketches) {
     // Algorithm 4 in HyperMinHash paper
-    if (sketches.length == 0) {
+    if (sketches.size() == 0) {
       throw new IllegalArgumentException("Input sketches cannot be empty.");
     }
 
-    if (sketches.length == 1) {
+    if (sketches.size() == 1) {
       return 1.0;
     }
 
     long c = 0;
     long n = 0;
-    for (int i = 0; i < sketches[0].registers.length; i++) {
-      if (sketches[0].registers[i] != 0) {
+    final BetaMinHash firstSketch = sketches.stream()
+        .findFirst()
+        .get();
+    for (int i = 0; i < firstSketch.registers.length; i++) {
+      if (firstSketch.registers[i] != 0) {
         boolean itemInIntersection = true;
         for (BetaMinHash sketch : sketches) {
           itemInIntersection =
-              itemInIntersection && sketches[0].registers[i] == sketch.registers[i];
+              itemInIntersection && firstSketch.registers[i] == sketch.registers[i];
         }
 
         if (itemInIntersection) {
@@ -86,7 +91,7 @@ public class BetaMinHashCombiner implements SketchCombiner<BetaMinHash> {
       return 0;
     }
 
-    double[] cardinalities = new double[sketches.length];
+    double[] cardinalities = new double[sketches.size()];
     int i = 0;
     for (BetaMinHash sk : sketches) {
       cardinalities[i++] = sk.cardinality();
