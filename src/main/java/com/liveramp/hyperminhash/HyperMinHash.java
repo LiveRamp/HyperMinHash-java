@@ -4,9 +4,7 @@ package com.liveramp.hyperminhash;
 import java.util.Arrays;
 
 public class HyperMinHash implements IntersectionSketch<HyperMinHash> {
-
-  private static final int HASH_SEED = 1738;
-
+  
   // used in serialization
   static final byte VERSION = 1;
 

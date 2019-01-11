@@ -1,7 +1,5 @@
 package com.liveramp.hyperminhash;
 
-import util.hash.MetroHash128;
-
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -79,9 +77,10 @@ public class BetaMinHash implements IntersectionSketch<BetaMinHash> {
 
   @Override
   public boolean offer(byte[] val) {
-    MetroHash128 hash = new MetroHash128(HASH_SEED).apply(ByteBuffer.wrap(val));
+    long[] _128BitHash = Murmur3.hash128(val);
     ByteBuffer buf = ByteBuffer.allocate(16);
-    hash.writeBigEndian(buf);
+    buf.putLong(_128BitHash[0]);
+    buf.putLong(_128BitHash[1]);
     return addHash(buf);
   }
 
