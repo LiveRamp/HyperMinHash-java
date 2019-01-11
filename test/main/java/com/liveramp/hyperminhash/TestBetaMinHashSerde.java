@@ -10,12 +10,8 @@ public class TestBetaMinHashSerde {
   @Test
   public void testRoundtripEmptySketch() {
     BetaMinHashSerde serde = new BetaMinHashSerde();
-    int iterations = 1_000;
-
-    RandomTestRunner.runRandomizedTest(iterations, rng -> {
-      BetaMinHash sketch = new BetaMinHash();
-      Assert.assertEquals(sketch, serde.fromBytes(serde.toBytes(sketch)));
-    });
+    BetaMinHash sketch = new BetaMinHash();
+    Assert.assertEquals(sketch, serde.fromBytes(serde.toBytes(sketch)));
   }
 
   @Test

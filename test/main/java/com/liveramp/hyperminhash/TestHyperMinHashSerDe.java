@@ -10,7 +10,7 @@ public class TestHyperMinHashSerDe {
   @Test
   public void testRoundtripEmptySketch() {
     HyperMinHashSerDe serde = new HyperMinHashSerDe();
-    int iterations = 1_000;
+    int iterations = 1_000; // multiple iterations so we can try for different values of P/R
 
     RandomTestRunner.runRandomizedTest(iterations, rng -> {
       int p = Math.max(rng.nextInt(21), 2);
