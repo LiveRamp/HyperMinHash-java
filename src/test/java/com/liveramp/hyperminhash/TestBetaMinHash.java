@@ -93,6 +93,5 @@ public class TestBetaMinHash {
         initialIntersectionSize,
         numIter
     );
-
   }
 }

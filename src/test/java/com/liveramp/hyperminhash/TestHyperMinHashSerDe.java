@@ -13,8 +13,8 @@ public class TestHyperMinHashSerDe {
     int iterations = 1_000; // multiple iterations so we can try for different values of P/R
 
     RandomTestRunner.runRandomizedTest(iterations, rng -> {
-      int p = Math.max(rng.nextInt(21), 2);
-      int r = Math.max(rng.nextInt(57), 2);
+      int p = Math.max(rng.nextInt(21), 4);
+      int r = Math.max(rng.nextInt(57), 4);
       HyperMinHash hyperMinHash = new HyperMinHash(p, r);
       Assert.assertEquals(hyperMinHash, serde.fromBytes(serde.toBytes(hyperMinHash)));
     });
@@ -25,8 +25,8 @@ public class TestHyperMinHashSerDe {
     HyperMinHashSerDe serde = new HyperMinHashSerDe();
     int iterations = 5_000;
     RandomTestRunner.runRandomizedTest(iterations, rng -> {
-      int p = Math.max(rng.nextInt(21), 2);
-      int r = Math.max(rng.nextInt(57), 2);
+      int p = Math.max(rng.nextInt(21), 4);
+      int r = Math.max(rng.nextInt(57), 4);
       HyperMinHash hmh = new HyperMinHash(p, r);
 
       int numElements = 1000;
@@ -43,8 +43,8 @@ public class TestHyperMinHashSerDe {
     // not super valuable right now since we store a fixed size sketch, but futureproofing
     HyperMinHashSerDe serde = new HyperMinHashSerDe();
     RandomTestRunner.runRandomizedTest(1_000, rng -> {
-      int p = Math.max(rng.nextInt(21), 2);
-      int r = Math.max(rng.nextInt(57), 2);
+      int p = Math.max(rng.nextInt(21), 4);
+      int r = Math.max(rng.nextInt(57), 4);
       HyperMinHash hmh = new HyperMinHash(p, r);
       int numElements = 1000;
       for (int j = 0; j < numElements; j++) {
