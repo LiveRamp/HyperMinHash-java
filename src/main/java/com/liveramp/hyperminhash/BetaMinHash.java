@@ -35,13 +35,13 @@ public class BetaMinHash implements IntersectionSketch<BetaMinHash> {
   public static final int P = 14;
   public static final int NUM_REGISTERS = (int) Math.pow(2, P);
 
-
   // TODO add actual validation if necessary
   // Q + R must always be <= 16 since we're packing values into 16 bit registers
   public static final int Q = 6;
   public static final int R = 10;
 
   private static final int HASH_SEED = 1337;
+  static final byte VERSION = 1;
 
   final short[] registers;
 
@@ -56,7 +56,7 @@ public class BetaMinHash implements IntersectionSketch<BetaMinHash> {
   /**
    * Create a BetaMinHash from the serialized representation returned by {@link #getBytes()}.
    */
-  public static BetaMinHash fromBytes(byte[] bytes) {
+  public static BetaMinHash wrapRegisters(byte[] bytes) {
     final int expectedNumBytes = 2 * NUM_REGISTERS; // 2 bytes per short
     if (bytes.length != expectedNumBytes) {
       throw new IllegalArgumentException(String.format(
