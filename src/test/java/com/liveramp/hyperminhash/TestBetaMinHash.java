@@ -17,7 +17,7 @@ public class TestBetaMinHash {
 
     final int maxUniqueElements = 10_000_000;
     final int minTestCardinality = 10_000;
-    final double pctErr = 2.0;
+    final double pctErr = 2.5;
     RandomTestRunner.runRandomizedTest(
         3,
         (random) -> CommonTests.testCardinality(
