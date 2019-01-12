@@ -74,7 +74,7 @@ HyperMinHashSerde serde = new HyperMinHashSerde();
 Commit authorship was lost when merging code. The maintainers of the library, in alphabetical order, are: 
 
 1) Christian Hansen (github.com/ChristianHansen)
-2) Harry Rackmil (github coming soon)
+2) Harry Rackmil (github.com/harryrackmil)
 3) Shrif Nada (github.com/sherifnada)
 
 
