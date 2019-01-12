@@ -7,26 +7,25 @@ import java.util.Arrays;
  * Implementation of HyperMinHash described in Yu and Weber: https://arxiv.org/pdf/1710.08436.pdf.
  * This class implements LogLog-Beta described in Qin, Kim, et al. here:
  * https://arxiv.org/pdf/1612.02284.pdf. Loglog-Beta is almost identical in accuracy to HyperLogLog
- * and HyperLogLog++ except it performs better on cardinality estimations for small datasets (n <=
+ * and HyperLogLog++ except it performs better on cardinality estimations for small datasets (n &le;
  * 200_000). It's also much simpler to implement.
- * <p>
+ *
  * The log log implementation uses the values of p and beta coefficients tested in the Loglog-beta
  * paper. It's possible to use different values of P but we'd need to recompute the beta
  * coefficients which is a computationally intensive process. So for now, this impl doesn't support
  * using different values of P. This being said the current value of P works with high accuracy for
  * very large cardinalities and small jaccard  indices. See the paper for more details.
- * <p>
- * <p>
+ *
  * Similarly, we use values of Q and R suggested in the HyperMinHash paper. Those are theoretically
  * changeable, but the current values should provide sufficient accuracy for set cardinalities up to
  * 2^89 (see Hyperminhash paper for reference).
- * <p>
+ *
  * If you want to be able to combine multiple BetaMinHash instances, or compute their intersection,
  * you can use {@link BetaMinHashCombiner}.
- * <p>
+ *
  * If you'd like this class to support custom Q or R or P values, please open a github issue.
- * <p>
  */
+
 public class BetaMinHash implements IntersectionSketch<BetaMinHash> {
 
   // HLL Precision parameter
@@ -100,6 +99,7 @@ public class BetaMinHash implements IntersectionSketch<BetaMinHash> {
   public int hashCode() {
     return Arrays.hashCode(registers);
   }
+
 
   @Override
   public BetaMinHash deepCopy() {

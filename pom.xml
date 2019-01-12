@@ -4,14 +4,31 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <groupId>com.liveramp</groupId>
   <artifactId>hyperminhash</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
 
-  <parent>
-    <groupId>com.liveramp</groupId>
-    <artifactId>pom-common</artifactId>
-    <version>1.1-SNAPSHOT</version>
-  </parent>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>
+    HyperMinHash is a probabilistic data structure that can approximate union, intersection, and set
+    cardinalities as well as Jaccard indices of very large sets with high accuracy, in loglog space,
+    and in a streaming fashion.
+  </description>
+  <url>www.github.com/LiveRamp/HyperMinHash-java</url>
+
+  <organization>
+    <name>LiveRamp</name>
+    <url>www.liveramp.com</url>
+  </organization>
+
+  <licenses>
+    <license>
+      <name>Apache 2</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
   <scm>
     <connection>scm:git:git@github.com:LiveRamp/HyperMinHash-java.git</connection>
@@ -20,35 +37,179 @@
     <tag>HEAD</tag>
   </scm>
 
+  <issueManagement>
+    <system>Github</system>
+    <url>www.github.com/LiveRamp/HyperMinHash-java</url>
+  </issueManagement>
+
+  <developers>
+    <developer>
+      <name>Christian Hansen</name>
+      <email>christianhshansen@gmail.com</email>
+      <organization>LiveRamp</organization>
+      <organizationUrl>www.liveramp.com</organizationUrl>
+    </developer>
+    <developer>
+      <name>Harry Rackmil</name>
+      <email>harryrackmil@gmail.com</email>
+      <organization>LiveRamp</organization>
+      <organizationUrl>www.liveramp.com</organizationUrl>
+    </developer>
+    <developer>
+      <name>Shrif Nada</name>
+      <email>snadalive@gmail.com</email>
+      <organization>LiveRamp</organization>
+      <organizationUrl>www.liveramp.com</organizationUrl>
+    </developer>
+  </developers>
+
   <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skip.tests>false</skip.tests>
     <hadoop.version>2.5.0</hadoop.version>
   </properties>
+
   <build>
     <plugins>
+      <!-- Used to pin the compiler to JDK 1.8 -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-          </execution>
-        </executions>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
         <configuration>
-          <finalName>uber-${artifactId}-${version}</finalName>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+
+      <!--
+      Used to publish artifacts produced by this project to Sonatype (which is mirrored to
+      Maven Central).
+      -->
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.8</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <!-- Used to sign artifacts with our GPG key, as required by Sona Type. -->
+    <profile>
+      <id>sign</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+                <!-- If testing releases with hardcoded values in your settings.xml file, uncomment
+                this setting to make GPG read those hardcoded literals -->
+                <!--<configuration>-->
+                <!--<gpgArguments>-->
+                <!--<arg>&#45;&#45;pinentry-mode</arg>-->
+                <!--<arg>loopback</arg>-->
+                <!--</gpgArguments>-->
+                <!--</configuration>-->
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- Used to generate a stand-alone JAR which includes all dependencies. Note that even though
+     we're using the shading plugin, we're not actually renaming any dependencies. We're only
+     using the shading plugin's capability to create an uber jar. -->
+    <profile>
+      <id>uberjar</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <finalName>uber-${artifactId}-${version}</finalName>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- Used to package the Javadocs and sourcecode for this project -->
+    <profile>
+      <id>build-src-and-docs</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+
+      <build>
+
+        <plugins>
+          <!-- Used to build a JAR containing the source code from this project -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.4</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- Used to generate javadocs for this project -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.10.4</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+
+      </build>
+    </profile>
+  </profiles>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.12</version>
+      <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-math3</artifactId>
@@ -56,31 +217,17 @@
     </dependency>
   </dependencies>
 
-  <repositories>
-    <repository>
-      <id>conjars.org</id>
-      <name>Conjars</name>
-      <url>http://conjars.org/repo</url>
-    </repository>
-    <repository>
-      <id>liveramp-repositories</id>
-      <name>Liveramp Repositories</name>
-      <url>http://repository.liveramp.com/artifactory/liveramp-repositories</url>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </snapshots>
-    </repository>
-  </repositories>
+  <distributionManagement>
 
-  <pluginRepositories>
-    <pluginRepository>
-      <id>sonatype-releases</id>
-      <url>http://oss.sonatype.org/content/repositories/releases</url>
-    </pluginRepository>
-    <pluginRepository>
-      <id>clojars.org</id>
-      <url>http://clojars.org/repo</url>
-    </pluginRepository>
-  </pluginRepositories>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+
+  </distributionManagement>
 </project>
