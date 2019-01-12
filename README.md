@@ -70,6 +70,14 @@ To get a byte[] representation of a sketch, use the `IntersectionSketch.SerDe` i
 HyperMinHashSerde serde = new HyperMinHashSerde();
 ```
 
+## Maintainers
+Commit authorship was lost when merging code. The maintainers of the library, in alphabetical order, are: 
+
+1) Christian Hansen (github.com/ChristianHansen)
+2) Harry Rackmil (github coming soon)
+3) Shrif Nada (github.com/sherifnada)
+
+
 ## Acknowledgements
 Thanks to Seif Lotfy for implementing a
 [Golang version of HyperMinHash](http://github.com/axiomhq/hyperminhash).
