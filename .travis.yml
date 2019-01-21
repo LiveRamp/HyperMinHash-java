@@ -11,3 +11,4 @@ script:
 
   # If successful, run the deploy script to publish produced artifacts
   - ./cd/deploy.sh
+  
