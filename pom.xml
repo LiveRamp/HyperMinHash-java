@@ -112,7 +112,6 @@
             <executions>
               <execution>
                 <id>sign-artifacts</id>
-                <phase>verify</phase>
                 <goals>
                   <goal>sign</goal>
                 </goals>
@@ -157,7 +156,7 @@
       </build>
     </profile>
 
-    <!-- Used to package the Javadocs and sourcecode for this project -->
+    <!-- Used to package the Javadocs and source code for this project -->
     <profile>
       <id>build-src-and-docs</id>
       <activation>
@@ -199,9 +198,15 @@
         </plugins>
 
       </build>
+
+      <!-- Disable javadoc linting -->
+      <properties>
+        <javadoc.opts>-Xdoclint:none</javadoc.opts>
+      </properties>
     </profile>
 
-    <!-- Used to push artifacts to LR external artifactory -->
+    <!-- To be used in any internal Jenkins builds which want to to push artifacts to the LR external
+    artifactory instead of use any versions on Sonatype -->
     <profile>
       <id>deploy-liveramp</id>
       <distributionManagement>
