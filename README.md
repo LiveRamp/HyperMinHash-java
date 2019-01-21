@@ -67,7 +67,13 @@ long intersectionCardinality = combiner.intersectionCardinality(sketches);
 ### Serializing a sketch
 To get a byte[] representation of a sketch, use the `IntersectionSketch.SerDe` interface:
 ```
+HyperMinHash sketch = getSketch();
 HyperMinHashSerde serde = new HyperMinHashSerde();
+
+byte[] serialized = serde.toBytes(sketch);
+HyperMinHash deserialized = serde.fromBytes(serialized);
+
+int sizeInBytes = serde.sizeInBytes(sketch);
 ```
 
 ## Maintainers
