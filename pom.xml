@@ -200,6 +200,41 @@
 
       </build>
     </profile>
+
+    <!-- Used to push artifacts to Sonatype (which is mirrored to Maven Central) -->
+    <profile>
+
+      <id>deploy-ossrh</id>
+      <distributionManagement>
+        <snapshotRepository>
+          <id>ossrh</id>
+          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+
+        <repository>
+          <id>ossrh</id>
+          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+      </distributionManagement>
+
+    </profile>
+
+    <!-- Used to push artifacts to LR external artifactory -->
+    <profile>
+      <id>deploy-liveramp</id>
+      <distributionManagement>
+        <snapshotRepository>
+          <id>repository.liveramp.com</id>
+          <name>repository.liveramp.com-snapshots</name>
+          <url>http://repository.liveramp.com/artifactory/libs-snapshot-local</url>
+        </snapshotRepository>
+        <repository>
+          <id>repository.liveramp.com</id>
+          <name>repository.liveramp.com-releases</name>
+          <url>http://repository.liveramp.com/artifactory/libs-release-local</url>
+        </repository>
+      </distributionManagement>
+    </profile>
   </profiles>
 
   <dependencies>
@@ -216,18 +251,4 @@
       <version>3.4.1</version>
     </dependency>
   </dependencies>
-
-  <distributionManagement>
-    <!-- test --> 
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-
-  </distributionManagement>
 </project>

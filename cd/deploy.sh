@@ -24,8 +24,8 @@
   gpg --fast-import "${CERT_DIR}"
   echo "Imported certs into GPG"
 
-  # Run the deploy phase (which will sign any artifacts). The build will use the GPG certs we
-  # imported above
-  mvn deploy -P sign,build-src-and-docs -DskipTests=true --settings "${TRAVIS_BUILD_DIR}/cd/mvnsettings.xml"
+  # Run the deploy phase (which will sign any artifacts and publish to Sonatype).
+  # The build will use the GPG certs we imported above
+  mvn deploy -P sign,build-src-and-docs,deploy-ossrh -DskipTests=true --settings "${TRAVIS_BUILD_DIR}/cd/mvnsettings.xml"
 #fi 
 
