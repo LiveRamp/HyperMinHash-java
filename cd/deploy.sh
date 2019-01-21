@@ -3,7 +3,6 @@
 # This script unencrypts GPG signing keys and imports them into the build environment so they
 # can be used to sign artifacts produced by this build.
 
-# When you're setting up CI, it might help to comment out this
 if [ "$TRAVIS_BRANCH" = 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
   CERT_DIR="${TRAVIS_BUILD_DIR}/cd/codesigning.asc"
   echo "Set certificate directory to ${CERT_DIR}"
