@@ -201,24 +201,6 @@
       </build>
     </profile>
 
-    <!-- Used to push artifacts to Sonatype (which is mirrored to Maven Central) -->
-    <profile>
-
-      <id>deploy-ossrh</id>
-      <distributionManagement>
-        <snapshotRepository>
-          <id>ossrh</id>
-          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-
-        <repository>
-          <id>ossrh</id>
-          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-      </distributionManagement>
-
-    </profile>
-
     <!-- Used to push artifacts to LR external artifactory -->
     <profile>
       <id>deploy-liveramp</id>
@@ -251,4 +233,16 @@
       <version>3.4.1</version>
     </dependency>
   </dependencies>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
 </project>
