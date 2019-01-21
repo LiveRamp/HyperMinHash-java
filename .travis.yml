@@ -1,10 +1,13 @@
 language: java
 jdk: oraclejdk8
-before_install: echo $var1
+
+# Since Maven installs deps automatically, skip Travis' install phase by
+# just running the command "true" which doesn't do much of anything.
 install: true
+
 script:
-- mvn clean package test -P-build-src-and-docs -B -V -DskipTests
-- "./cd/deploy.sh"
-env:
-  global:
-    secure: V/YrH1+Cnytyv8VY17dCH+E9lbJOzhRgyHitYJShIL5NLGNNoU0ecinVEPKYCMMK5QQbyAR6dICvCD/WBOHAdcg+tS89i7VuyOpocFpT4mZp1XmCfhuTRsQ9ytfmefIfoSa4fZu7etTQPShKiBuS4KHb4o9ujv13plExWfwPd5+QkMpDDTCuIpztfgNSLY62o5Y+4Cqc3FfWDg5fzLvuGIrwKoG4+liGhDopEKFAymPJNj6wtKA6CMbpjw6l2D51oW9HYT0NW/0unyrM78ON0mErYkij3twcH8VdIcac3Qe2h1Fk3c65uzwPe8vsPdHkJsXVX+Hn48QJ4GZ5AsmIr+jA3aHF1rxoea6iZLEJfeB7W24qPpVtqvkAiB7oJaqKFBCilGiVgGseFCyttKjzkIG+Pj/uCGt6g+JT7UhObPOJhq9ewYAUO1gNUEeU+N7Vo2qQWV3csNPGQmCfmGMvWo0PjmEuTxfhqjCEFGe2qdC9hC+/40frLUITGdpZ1thdkbQqTQ1pLcBw5uLs2Rghonh4Ev7P9cU8sQQQgt/SdAHzThn0iU+yGLZE/0kyHPGWmsORT6n68qOOAoAR+A2onxjgy4SHWxLl1Z8EP4PMIRGp/PCE7Jcmm8f5X7MRH4OkzOa7v/LV4JqfsqnQHSpcyoOycMi0ksHhFiZ0WwfzyQM=
+  # First install any deps and runs tests
+  - mvn clean package test -P-build-src-and-docs -B -V
+
+  # If successful, run the deploy script to publish produced artifacts
+  - ./cd/deploy.sh
