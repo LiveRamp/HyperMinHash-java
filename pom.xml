@@ -103,11 +103,6 @@
     <!-- Used to sign artifacts with our GPG key, as required by Sona Type. -->
     <profile>
       <id>sign</id>
-      <properties>
-        <gpg.executable>gpg</gpg.executable>
-        <gpg.keyname>${env.GPG_KEY_NAME}</gpg.keyname>
-        <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
-      </properties>
       <build>
         <plugins>
           <plugin>
@@ -247,15 +242,15 @@
     </dependency>
   </dependencies>
 
-  <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
+  <!--<distributionManagement>-->
+  <!--<snapshotRepository>-->
+  <!--<id>ossrh</id>-->
+  <!--<url>https://oss.sonatype.org/content/repositories/snapshots</url>-->
+  <!--</snapshotRepository>-->
 
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
+  <!--<repository>-->
+  <!--<id>ossrh</id>-->
+  <!--<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>-->
+  <!--</repository>-->
+  <!--</distributionManagement>-->
 </project>
