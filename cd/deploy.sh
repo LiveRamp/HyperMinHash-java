@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 
 # TODO comment this back in
-if [ "$TRAVIS_BRANCH" = 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
+#if [ "$TRAVIS_BRANCH" = 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
   CERT_DIR="${TRAVIS_BUILD_DIR}/cd/codesigning.asc"
   echo "Set certificate directory to ${CERT_DIR}"
 
@@ -27,5 +27,5 @@ if [ "$TRAVIS_BRANCH" = 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; the
   # Run the deploy phase (which will sign any artifacts). The build will use the GPG certs we
   # imported above
   mvn deploy -P sign,build-src-and-docs -DskipTests=true --settings "${TRAVIS_BUILD_DIR}/cd/mvnsettings.xml"
-fi 
+#fi 
 
