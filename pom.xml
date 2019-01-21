@@ -65,8 +65,6 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <skip.tests>false</skip.tests>
-    <hadoop.version>2.5.0</hadoop.version>
   </properties>
 
   <build>
@@ -188,9 +186,12 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.10.4</version>
+            <version>3.0.0</version>
             <executions>
               <execution>
+                <configuration>
+                  <doclint>none</doclint>
+                </configuration>
                 <id>attach-javadocs</id>
                 <goals>
                   <goal>jar</goal>
@@ -199,13 +200,7 @@
             </executions>
           </plugin>
         </plugins>
-
       </build>
-
-      <!-- Disable javadoc linting -->
-      <properties>
-        <javadoc.opts>-Xdoclint:none</javadoc.opts>
-      </properties>
     </profile>
 
     <!-- To be used in any internal Jenkins builds which want to to push artifacts to the LR external
