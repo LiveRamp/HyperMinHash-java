@@ -103,6 +103,11 @@
     <!-- Used to sign artifacts with our GPG key, as required by Sona Type. -->
     <profile>
       <id>sign</id>
+      <properties>
+        <gpg.executable>gpg</gpg.executable>
+        <gpg.keyname>${env.GPG_KEY_NAME}</gpg.keyname>
+        <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -113,6 +118,9 @@
               <execution>
                 <id>sign-artifacts</id>
                 <goals>
+                  <!-- The "sign" goal is one of the GPG plugin's
+                 goals. It produces signature files for the
+                  artifacts in this build. -->
                   <goal>sign</goal>
                 </goals>
                 <!-- If testing releases with hardcoded values in your settings.xml file, uncomment
