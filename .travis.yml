@@ -1,13 +1,13 @@
 language: java
 jdk: oraclejdk8
 
-# Since Maven installs deps, skip the install phase since it doesn't really apply.
-# This just runs the command "true" in the install phase which doesn't do much of anything.
+# Since Maven installs deps automatically, skip Travis' install phase by
+# just running the command "true" which doesn't do much of anything.
 install: true
 
 script:
   # First install any deps and runs tests
   - mvn clean package test -P-build-src-and-docs -B -V
+
   # If successful, run the deploy script to publish produced artifacts
   - ./cd/deploy.sh
-

@@ -65,8 +65,6 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <skip.tests>false</skip.tests>
-    <hadoop.version>2.5.0</hadoop.version>
   </properties>
 
   <build>
@@ -112,8 +110,10 @@
             <executions>
               <execution>
                 <id>sign-artifacts</id>
-                <phase>verify</phase>
                 <goals>
+                  <!-- The "sign" goal is one of the GPG plugin's
+                 goals. It produces signature files for the
+                  artifacts in this build. -->
                   <goal>sign</goal>
                 </goals>
                 <!-- If testing releases with hardcoded values in your settings.xml file, uncomment
@@ -157,7 +157,7 @@
       </build>
     </profile>
 
-    <!-- Used to package the Javadocs and sourcecode for this project -->
+    <!-- Used to package the Javadocs and source code for this project -->
     <profile>
       <id>build-src-and-docs</id>
       <activation>
@@ -186,9 +186,12 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.10.4</version>
+            <version>3.0.0</version>
             <executions>
               <execution>
+                <configuration>
+                  <doclint>none</doclint>
+                </configuration>
                 <id>attach-javadocs</id>
                 <goals>
                   <goal>jar</goal>
@@ -197,8 +200,25 @@
             </executions>
           </plugin>
         </plugins>
-
       </build>
+    </profile>
+
+    <!-- To be used in any internal Jenkins builds which want to to push artifacts to the LR external
+    artifactory instead of use any versions on Sonatype -->
+    <profile>
+      <id>deploy-liveramp</id>
+      <distributionManagement>
+        <snapshotRepository>
+          <id>repository.liveramp.com</id>
+          <name>repository.liveramp.com-snapshots</name>
+          <url>http://repository.liveramp.com/artifactory/libs-snapshot-local</url>
+        </snapshotRepository>
+        <repository>
+          <id>repository.liveramp.com</id>
+          <name>repository.liveramp.com-releases</name>
+          <url>http://repository.liveramp.com/artifactory/libs-release-local</url>
+        </repository>
+      </distributionManagement>
     </profile>
   </profiles>
 
@@ -218,7 +238,6 @@
   </dependencies>
 
   <distributionManagement>
-
     <snapshotRepository>
       <id>ossrh</id>
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -228,6 +247,5 @@
       <id>ossrh</id>
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
-
   </distributionManagement>
 </project>

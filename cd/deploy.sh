@@ -1,14 +1,13 @@
 #! /usr/bin/env bash
 
-# TODO comment this back in
+# This script unencrypts GPG signing keys and imports them into the build environment so they
+# can be used to sign artifacts produced by this build.
+
 if [ "$TRAVIS_BRANCH" = 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
   CERT_DIR="${TRAVIS_BUILD_DIR}/cd/codesigning.asc"
   echo "Set certificate directory to ${CERT_DIR}"
 
-  # This block unencrypts GPG signing keys and imports them into the build environment so they
-  # can be used to sign artifacts produced by this build.
-
-  # If any of these commands fail, exit so we get quick feedback from the build.
+  # If any of the script's commands fail, exit so we get quick feedback from the build.
   set -e
 
   # The cert is stored as base64 to prevent interpretation issues in bash, so decode it and store
@@ -24,8 +23,9 @@ if [ "$TRAVIS_BRANCH" = 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; the
   gpg --fast-import "${CERT_DIR}"
   echo "Imported certs into GPG"
 
-  # Run the deploy phase (which will sign any artifacts). The build will use the GPG certs we
-  # imported above
+  # Run the deploy phase (which will sign any artifacts and publish to Sonatype).
+  # The build will use the GPG certs we imported above
+  # It's ok to skip tests since this script assumes tests were already run
+  # beforehand
   mvn deploy -P sign,build-src-and-docs -DskipTests=true --settings "${TRAVIS_BUILD_DIR}/cd/mvnsettings.xml"
-fi 
-
+fi
