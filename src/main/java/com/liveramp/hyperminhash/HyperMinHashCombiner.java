@@ -22,16 +22,14 @@ public class HyperMinHashCombiner implements SketchCombiner<HyperMinHash> {
       return firstSketch.deepCopy();
     }
 
-    final int numRegisters = firstSketch.registers.length;
+    final int numRegisters = firstSketch.registers.getNumRegisters();
     final HyperMinHash mergedSketch = firstSketch.deepCopy();
     int r = mergedSketch.r;
 
     for (int i = 0; i < numRegisters; i++) {
       for (HyperMinHash sketch : sketches) {
 
-        if (HyperMinHash.shouldReplace(mergedSketch.registers[i], sketch.registers[i], r)) {
-          mergedSketch.registers[i] = sketch.registers[i];
-        }
+        mergedSketch.registers.updateIfGreaterThan(i, sketch.registers.getRegisterAtIndex(i), r);
       }
     }
 
@@ -62,15 +60,15 @@ public class HyperMinHashCombiner implements SketchCombiner<HyperMinHash> {
     long c = 0;
     long n = 0;
     final HyperMinHash firstSketch = sketches.stream().findFirst().get();
-    long numRegisters = firstSketch.registers.length;
+    long numRegisters = firstSketch.registers.getNumRegisters();
     int r = firstSketch.r;
     for (int i = 0; i < numRegisters; i++) {
-      if (firstSketch.registers[i] != 0) {
+      if (firstSketch.registers.getRegisterAtIndex(i) != 0) {
         boolean itemInIntersection = true;
         for (HyperMinHash sketch : sketches) {
           itemInIntersection = itemInIntersection &&
-              LongPacker.unpackMantissa(firstSketch.registers[i], r) == LongPacker
-                  .unpackMantissa(sketch.registers[i], r);
+              firstSketch.registers.getMantissaAtRegister(i, r) == sketch.registers
+                  .getMantissaAtRegister(i, r);
         }
 
         if (itemInIntersection) {
@@ -79,7 +77,7 @@ public class HyperMinHashCombiner implements SketchCombiner<HyperMinHash> {
       }
 
       for (HyperMinHash sketch : sketches) {
-        if (sketch.registers[i] != 0) {
+        if (sketch.registers.getRegisterAtIndex(i) != 0) {
           n++;
           break;
         }

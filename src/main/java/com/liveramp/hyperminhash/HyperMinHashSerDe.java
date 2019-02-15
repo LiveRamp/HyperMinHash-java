@@ -46,6 +46,7 @@ public class HyperMinHashSerDe implements IntersectionSketch.SerDe<HyperMinHash>
     outputBuffer.putInt(sketch.p);
     outputBuffer.putInt(sketch.r);
     outputBuffer.putInt(sketch.registers.length);
+    //TODO
     for (long register : sketch.registers) {
       outputBuffer.putLong(register);
     }

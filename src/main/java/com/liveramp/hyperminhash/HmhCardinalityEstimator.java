@@ -913,8 +913,8 @@ class HmhCardinalityEstimator implements Serializable {
    *     registers by determining the number of leading zeroes of hash represented by each packed
    *     register, and using HLL-based estimation from there.
    */
-  static long estimateCardinality(long[] registers, int p, int r) {
-    if ((1 << p) != registers.length) {
+  static long estimateCardinality(Registers registers, int p, int r) {
+    if ((1 << p) != registers.getNumRegisters()) {
       throw new IllegalStateException();
     }
 
@@ -922,17 +922,11 @@ class HmhCardinalityEstimator implements Serializable {
 
     //TODO(christianhansen) a nice-to-have here could be using a different estimator for large
     // cardinalities, like the k-smallest element-based estimation from Yu and Weber.
-    int numZeroRegisters = 0;
-    for (long register : registers) {
-      // Registers with value zero must represent an empty bucket
-      if (register == 0) {
-        numZeroRegisters++;
-      }
-    }
+    int numZeroRegisters = registers.getNumZeroRegisters();
 
     if (numZeroRegisters != 0) {
       final long linearCountingEstimate = Math.round(
-          linearCountingEstimate(registers.length, numZeroRegisters)
+          linearCountingEstimate(registers.getNumRegisters(), numZeroRegisters)
       );
 
       if (useLinearCounting(p, linearCountingEstimate)) {
@@ -971,13 +965,13 @@ class HmhCardinalityEstimator implements Serializable {
     }
   }
 
-  private static long basicHllEstimate(long[] registers, int p, int r) {
+  private static long basicHllEstimate(Registers registers, int p, int r) {
     double denominator = 0.0;
-    for (long register : registers) {
-      denominator += Math.pow(2, -1 * LongPacker.unpackPositionOfFirstOne(register, r));
+    for (int i =0 ; i < registers.getNumRegisters(); i++) {
+      denominator += Math.pow(2, -1 * registers.getPositionOfFirstOneAtRegister(i, r));
     }
 
-    final double numerator = alpha(p) * registers.length * registers.length;
+    final double numerator = alpha(p) * registers.getNumRegisters() * registers.getNumRegisters();
     return Math.round(numerator / denominator);
   }
 

@@ -1,8 +1,6 @@
 package com.liveramp.hyperminhash;
 
 
-import java.util.Arrays;
-
 public class HyperMinHash implements IntersectionSketch<HyperMinHash> {
   
   // used in serialization
@@ -16,7 +14,7 @@ public class HyperMinHash implements IntersectionSketch<HyperMinHash> {
    * significant bits i.e. number of leading zeroes is stored in bits r through r + q - 1 of the
    * long.
    */
-  final long[] registers;
+  final Registers registers;
   final int p; // must be at least 4
   // This is 2^q + 1 in the HMH paper. We use this to represent the space that we're searching for a
   // leading zero.
@@ -31,11 +29,11 @@ public class HyperMinHash implements IntersectionSketch<HyperMinHash> {
     this(p, r, null);
   }
 
-  static HyperMinHash wrapRegisters(int p, int r, long[] registers) {
+  static HyperMinHash wrapRegisters(int p, int r, Registers registers) {
     return new HyperMinHash(p, r, registers);
   }
 
-  private HyperMinHash(int p, int r, long[] registers) {
+  private HyperMinHash(int p, int r, Registers registers) {
     // Ensure that the number of registers isn't larger than the largest array java can hold in
     // memory biggest java array can be of size Integer.MAX_VALUE
     if (!(p >= 4 && p < 31)) {
@@ -55,9 +53,9 @@ public class HyperMinHash implements IntersectionSketch<HyperMinHash> {
     this.numZeroSearchBits = Long.SIZE - p;
     this.r = r;
     if (registers == null) {
-      this.registers = new long[1 << p];
+      this.registers = new Registers(p, r);
     } else {
-      this.registers = registers;
+      this.registers = registers
     }
   }
 
@@ -88,17 +86,12 @@ public class HyperMinHash implements IntersectionSketch<HyperMinHash> {
 
     final long incomingRegister = LongPacker.pack(leftmostOnePosition, minHashBits, r);
 
-    if (shouldReplace(registers[registerIndex], incomingRegister, r)) {
-      registers[registerIndex] = incomingRegister;
-      return true;
-    }
-
-    return false;
+    return registers.updateIfGreaterThan(registerIndex, incomingRegister, r);
   }
 
   @Override
   public HyperMinHash deepCopy() {
-    return new HyperMinHash(p, r, Arrays.copyOf(registers, registers.length));
+    return new HyperMinHash(p, r, registers.deepCopy());
   }
 
   // we could replace this with a single comparison of the registers but it'd be less clear
@@ -141,12 +134,14 @@ public class HyperMinHash implements IntersectionSketch<HyperMinHash> {
     if (r != that.r) {
       return false;
     }
-    return Arrays.equals(registers, that.registers);
+
+
+    return this.registers.equals(that.registers);
   }
 
   @Override
   public int hashCode() {
-    int result = Arrays.hashCode(registers);
+    int result = registers.hashCode();
     result = 31 * result + p;
     result = 31 * result + numZeroSearchBits;
     result = 31 * result + r;
@@ -156,10 +151,10 @@ public class HyperMinHash implements IntersectionSketch<HyperMinHash> {
   @Override
   public String toString() {
     return "HyperMinHash{" +
-        "registers=" + Arrays.toString(registers) +
         ", p=" + p +
         ", numZeroSearchBits=" + numZeroSearchBits +
         ", r=" + r +
+        "registers=" + registers.toString() +
         '}';
   }
 }
