@@ -1,10 +1,11 @@
 package com.liveramp.hyperminhash;
 
+import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
+
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 
 class HmhCardinalityEstimator implements Serializable {
 
@@ -910,8 +911,8 @@ class HmhCardinalityEstimator implements Serializable {
 
   /**
    * @return a estimate of the cardinality of the elements represented by the HyperMinHash packed
-   *     registers by determining the number of leading zeroes of hash represented by each packed
-   *     register, and using HLL-based estimation from there.
+   * registers by determining the number of leading zeroes of hash represented by each packed
+   * register, and using HLL-based estimation from there.
    */
   static long estimateCardinality(Registers registers, int p, int r) {
     if ((1 << p) != registers.getNumRegisters()) {
@@ -967,8 +968,8 @@ class HmhCardinalityEstimator implements Serializable {
 
   private static long basicHllEstimate(Registers registers, int p, int r) {
     double denominator = 0.0;
-    for (int i =0 ; i < registers.getNumRegisters(); i++) {
-      denominator += Math.pow(2, -1 * registers.getPositionOfFirstOneAtRegister(i, r));
+    for (int i = 0; i < registers.getNumRegisters(); i++) {
+      denominator += Math.pow(2, -1 * registers.getPositionOfFirstOneAtRegister(i));
     }
 
     final double numerator = alpha(p) * registers.getNumRegisters() * registers.getNumRegisters();

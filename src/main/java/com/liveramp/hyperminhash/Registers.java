@@ -1,52 +1,35 @@
 package com.liveramp.hyperminhash;
 
-class Registers {
+/**
+ * Interface over the HMH sketch's array of registers. This iface allows us to use the smallest
+ * representation possible for registers without HMH's "business logic" having to know about it.
+ */
+interface Registers<T extends Registers<T>> {
 
-  Registers(int p, int r){
-
+  static Registers newRegisters(int p, int r) {
+    if (r > 25) {
+      return new LongRegisters(p, r);
+    } else {
+      return new IntRegisters(p, r);
+    }
   }
 
-  public boolean updateIfGreaterThan(int registerIndex, long incomingRegister, int r) {
-    throw new RuntimeException("unimplemented");
+  /**
+   * @param registerIndex
+   * @param incomingRegister
+   * @return
+   */
+  boolean updateIfGreaterThan(int registerIndex, long incomingRegister);
 
-  }
+  long getRegisterAtIndex(int index);
 
-  public long getRegisterAtIndex(int index){
-    throw new RuntimeException("unimplemented");
-  }
+  T deepCopy();
 
-  public Registers deepCopy() {
-    throw new RuntimeException("unimplemented");
-  }
+  int getNumRegisters();
 
-  public int getNumRegisters(){
-    throw new RuntimeException("unimplemented");
-  }
+  int getPositionOfFirstOneAtRegister(int index);
 
-  public int getPositionOfFirstOneAtRegister(int index, int r){
-    throw new RuntimeException("unimplemented");
-  }
+  long getMantissaAtRegister(int index);
 
-  public long getMantissaAtRegister(int index, int r){
-    throw new RuntimeException("unimplemented");
-  }
-
-  public int getNumZeroRegisters(){
-    throw new RuntimeException("unimplemented");
-  }
-
-  @Override
-  public String toString() {
-    throw new RuntimeException("unimplemented");
-  }
-
-  @Override
-  public int hashCode() {
-    throw new RuntimeException("unimplemented");
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    throw new RuntimeException("unimplemented");
-  }
+  int getNumZeroRegisters();
 }

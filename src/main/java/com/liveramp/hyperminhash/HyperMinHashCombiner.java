@@ -24,12 +24,11 @@ public class HyperMinHashCombiner implements SketchCombiner<HyperMinHash> {
 
     final int numRegisters = firstSketch.registers.getNumRegisters();
     final HyperMinHash mergedSketch = firstSketch.deepCopy();
-    int r = mergedSketch.r;
 
     for (int i = 0; i < numRegisters; i++) {
       for (HyperMinHash sketch : sketches) {
 
-        mergedSketch.registers.updateIfGreaterThan(i, sketch.registers.getRegisterAtIndex(i), r);
+        mergedSketch.registers.updateIfGreaterThan(i, sketch.registers.getRegisterAtIndex(i));
       }
     }
 
@@ -61,14 +60,13 @@ public class HyperMinHashCombiner implements SketchCombiner<HyperMinHash> {
     long n = 0;
     final HyperMinHash firstSketch = sketches.stream().findFirst().get();
     long numRegisters = firstSketch.registers.getNumRegisters();
-    int r = firstSketch.r;
     for (int i = 0; i < numRegisters; i++) {
       if (firstSketch.registers.getRegisterAtIndex(i) != 0) {
         boolean itemInIntersection = true;
         for (HyperMinHash sketch : sketches) {
           itemInIntersection = itemInIntersection &&
-              firstSketch.registers.getMantissaAtRegister(i, r) == sketch.registers
-                  .getMantissaAtRegister(i, r);
+              firstSketch.registers.getMantissaAtRegister(i) == sketch.registers
+                  .getMantissaAtRegister(i);
         }
 
         if (itemInIntersection) {

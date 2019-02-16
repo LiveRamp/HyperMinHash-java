@@ -40,7 +40,6 @@ public class TestHyperMinHashSerDe {
 
   @Test
   public void testSizeInBytes() {
-    // not super valuable right now since we store a fixed size sketch, but futureproofing
     HyperMinHashSerDe serde = new HyperMinHashSerDe();
     RandomTestRunner.runRandomizedTest(1_000, rng -> {
       int p = Math.max(rng.nextInt(21), 4);

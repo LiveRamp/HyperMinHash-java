@@ -2,7 +2,7 @@ package com.liveramp.hyperminhash;
 
 
 public class HyperMinHash implements IntersectionSketch<HyperMinHash> {
-  
+
   // used in serialization
   static final byte VERSION = 1;
 
@@ -26,14 +26,10 @@ public class HyperMinHash implements IntersectionSketch<HyperMinHash> {
    * @param r Number of MinHash bits to keep
    */
   public HyperMinHash(int p, int r) {
-    this(p, r, null);
+    this(p, r, Registers.newRegisters(p, r));
   }
 
-  static HyperMinHash wrapRegisters(int p, int r, Registers registers) {
-    return new HyperMinHash(p, r, registers);
-  }
-
-  private HyperMinHash(int p, int r, Registers registers) {
+  HyperMinHash(int p, int r, Registers registers) {
     // Ensure that the number of registers isn't larger than the largest array java can hold in
     // memory biggest java array can be of size Integer.MAX_VALUE
     if (!(p >= 4 && p < 31)) {
@@ -52,11 +48,7 @@ public class HyperMinHash implements IntersectionSketch<HyperMinHash> {
     this.p = p;
     this.numZeroSearchBits = Long.SIZE - p;
     this.r = r;
-    if (registers == null) {
-      this.registers = new Registers(p, r);
-    } else {
-      this.registers = registers
-    }
+    this.registers = registers;
   }
 
   @Override
@@ -86,32 +78,12 @@ public class HyperMinHash implements IntersectionSketch<HyperMinHash> {
 
     final long incomingRegister = LongPacker.pack(leftmostOnePosition, minHashBits, r);
 
-    return registers.updateIfGreaterThan(registerIndex, incomingRegister, r);
+    return registers.updateIfGreaterThan(registerIndex, incomingRegister);
   }
 
   @Override
   public HyperMinHash deepCopy() {
     return new HyperMinHash(p, r, registers.deepCopy());
-  }
-
-  // we could replace this with a single comparison of the registers but it'd be less clear
-  // it could be swapped if it meaningfully affects performance
-  static boolean shouldReplace(long currentRegister, long incomingRegister, int r) {
-    int currentLeadingOnePosition = LongPacker.unpackPositionOfFirstOne(currentRegister, r);
-    int incomingLeadingOnePosition = LongPacker.unpackPositionOfFirstOne(incomingRegister, r);
-
-    if (currentLeadingOnePosition < incomingLeadingOnePosition) {
-      return true;
-    } else if (currentLeadingOnePosition == incomingLeadingOnePosition) {
-      long currentMantissa = LongPacker.unpackMantissa(currentRegister, r);
-      long incomingMantissa = LongPacker.unpackMantissa(incomingRegister, r);
-
-      if (currentMantissa > incomingMantissa) {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   @Override
@@ -134,7 +106,6 @@ public class HyperMinHash implements IntersectionSketch<HyperMinHash> {
     if (r != that.r) {
       return false;
     }
-
 
     return this.registers.equals(that.registers);
   }
