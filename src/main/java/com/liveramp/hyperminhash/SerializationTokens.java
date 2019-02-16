@@ -9,8 +9,8 @@ import java.util.Optional;
  */
 class SerializationTokens {
 
-  static final Map<Class<? extends IntersectionSketch<?>>, Byte> classToToken;
-  static final Map<Byte, Class<? extends IntersectionSketch<?>>> tokenToClass;
+  private static final Map<Class, Byte> classToToken;
+  private static final Map<Byte, Class> tokenToClass;
 
   static {
     // Tokens can only be added. They should not be removed or edited.
@@ -22,14 +22,20 @@ class SerializationTokens {
 
     classToToken.put(BetaMinHash.class, (byte) 2);
     tokenToClass.put((byte) 2, BetaMinHash.class);
+
+    classToToken.put(LongRegisters.class, (byte) 3);
+    tokenToClass.put((byte) 3, LongRegisters.class);
+
+    classToToken.put(IntRegisters.class, (byte) 4);
+    tokenToClass.put((byte) 4, IntRegisters.class);
   }
 
-  static <T extends IntersectionSketch<T>> Optional<Byte> getTokenForClass(Class<T> clazz) {
+  static Optional<Byte> getTokenForClass(Class clazz) {
     return Optional.ofNullable(classToToken.get(clazz));
   }
 
-  static <T extends IntersectionSketch<T>> Optional<Class<T>> getClassForToken(byte token) {
-    return Optional.ofNullable((Class<T>) tokenToClass.get(token));
+  static Optional<Class> getClassForToken(byte token) {
+    return Optional.ofNullable(tokenToClass.get(token));
   }
 
 }
