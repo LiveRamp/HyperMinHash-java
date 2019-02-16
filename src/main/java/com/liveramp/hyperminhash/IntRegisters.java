@@ -3,7 +3,7 @@ package com.liveramp.hyperminhash;
 import java.util.Arrays;
 import java.util.Objects;
 
-class IntRegisters implements Registers {
+class IntRegisters implements Registers<IntRegisters> {
 
   final int[] registers;
   private final int p;

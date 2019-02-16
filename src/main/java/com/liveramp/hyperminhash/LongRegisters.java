@@ -3,7 +3,7 @@ package com.liveramp.hyperminhash;
 import java.util.Arrays;
 import java.util.Objects;
 
-class LongRegisters implements Registers {
+class LongRegisters implements Registers<LongRegisters> {
 
   final long[] registers;
   private final int p;
@@ -16,10 +16,6 @@ class LongRegisters implements Registers {
   LongRegisters(int p, int r, long[] registers) {
     this.p = p;
     this.r = r;
-    if (r < 26) {
-      // warn?
-    }
-
     this.registers = registers;
   }
 
