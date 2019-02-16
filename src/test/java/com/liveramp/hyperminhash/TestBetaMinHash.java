@@ -17,7 +17,7 @@ public class TestBetaMinHash {
 
     final int maxUniqueElements = 10_000_000;
     final int minTestCardinality = 10_000;
-    final double pctErr = 2.5;
+    final double pctErr = 3.0;
     RandomTestRunner.runRandomizedTest(
         3,
         (random) -> CommonTests.testCardinality(
@@ -33,7 +33,7 @@ public class TestBetaMinHash {
   public void testUnion() {
     final BetaMinHashCombiner combiner = BetaMinHashCombiner.getInstance();
     final int elementsPerSketch = 1_500_000;
-    final double pctErr = 2.0;
+    final double pctErr = 3.0;
     RandomTestRunner.runRandomizedTest(
         3,
         (random) -> CommonTests.testUnion(

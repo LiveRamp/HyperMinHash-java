@@ -16,7 +16,7 @@ public class TestHyperMinHash {
   public void testCardinality() {
     final int maxUniqueElements = 10_000_000;
     final int minTestCardinality = 10_000;
-    final double pctErr = 2.0;
+    final double pctErr = 3.0;
     RandomTestRunner.runRandomizedTest(
         3,
         (random) -> CommonTests.testCardinality(
@@ -32,7 +32,7 @@ public class TestHyperMinHash {
   public void testUnion() {
     final HyperMinHashCombiner combiner = HyperMinHashCombiner.getInstance();
     final int elementsPerSketch = 1_500_000;
-    final double pctErr = 2.0;
+    final double pctErr = 3.0;
     RandomTestRunner.runRandomizedTest(
         3,
         (random) -> CommonTests.testUnion(
