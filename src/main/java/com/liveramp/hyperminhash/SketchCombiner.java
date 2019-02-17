@@ -1,6 +1,7 @@
 package com.liveramp.hyperminhash;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -20,10 +21,24 @@ public interface SketchCombiner<T extends IntersectionSketch<T>> extends Seriali
   T union(Collection<T> sketches);
 
   /**
+   * @see #union(Collection)
+   */
+  default T union(T... sketches) {
+    return union(Arrays.asList(sketches));
+  }
+
+  /**
    * Return an estimate of the cardinality of the intersection of the elements in the sets
    * represented by {@code sketches}.
    */
   long intersectionCardinality(Collection<T> sketches);
+
+  /**
+   * @see #intersectionCardinality(Collection)
+   */
+  default long intersectionCardinality(T... sketches) {
+    return intersectionCardinality(Arrays.asList(sketches));
+  }
 
   /**
    * Return an estimate of the Jaccard index of the sets represented by {@code sketches}. The
@@ -31,5 +46,12 @@ public interface SketchCombiner<T extends IntersectionSketch<T>> extends Seriali
    * cardinality of the union of those sets.
    */
   double similarity(Collection<T> sketches);
+
+  /**
+   * @see #similarity(IntersectionSketch[])
+   */
+  default double similarity(T... sketches) {
+    return similarity(Arrays.asList(sketches));
+  }
 
 }
