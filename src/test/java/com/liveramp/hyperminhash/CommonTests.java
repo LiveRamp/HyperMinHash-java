@@ -103,7 +103,7 @@ class CommonTests {
       }
 
       final long expected = (long) (elementsInLeftSketches - elementsInLeftSketches * frac);
-      final long result = combiner.intersectionCardinality(Arrays.asList(sk1, sk2));
+      final long result = combiner.intersection(Arrays.asList(sk1, sk2));
 
       final double pctError = 100 * getError(result, expected);
       Assert.assertTrue(
@@ -134,7 +134,7 @@ class CommonTests {
 
     final double expectedJaccardIndex = smallSetSize / (double) bigSetSize;
     final long expectedIntersection = (long) (expectedJaccardIndex * bigSetSize);
-    final long actualIntersection = combiner.intersectionCardinality(
+    final long actualIntersection = combiner.intersection(
         Arrays.asList(smallSketch, bigSketch)
     );
     final double pctError = 100 * getError(actualIntersection, expectedIntersection);
@@ -166,7 +166,7 @@ class CommonTests {
       buildIntersectingSketches(sketchSize, intersectionSize, sk1, sk2, sk3, sk4);
 
       long expectedIntersection = intersectionSize;
-      long actualIntersection = combiner.intersectionCardinality(Arrays.asList(sk1, sk2, sk3));
+      long actualIntersection = combiner.intersection(Arrays.asList(sk1, sk2, sk3));
       double pctError = 100 * getError(actualIntersection, expectedIntersection);
       Assert.assertTrue(
           String.format("Expected pctError to be <2, found %f. Expected: %d, Actual: %d", pctError,

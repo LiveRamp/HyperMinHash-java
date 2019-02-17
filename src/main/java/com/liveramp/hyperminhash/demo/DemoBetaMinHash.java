@@ -80,7 +80,7 @@ public class DemoBetaMinHash {
     sb.append(combiner.union(sketches).cardinality() + ", ");
 
     sb.append(exactIntersectionSize + ", ");
-    sb.append(combiner.intersectionCardinality(sketches) + ", ");
+    sb.append(combiner.intersection(sketches) + ", ");
 
     // jaccard
     sb.append(exactIntersectionSize / (double) exactUnionSize + ", ");

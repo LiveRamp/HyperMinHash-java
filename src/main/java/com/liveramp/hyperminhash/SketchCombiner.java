@@ -31,7 +31,7 @@ public interface SketchCombiner<T extends IntersectionSketch<T>> extends Seriali
    * Return an estimate of the cardinality of the intersection of the elements in the sets
    * represented by {@code sketches}.
    */
-  default long intersectionCardinality(Collection<T> sketches){
+  default long intersection(Collection<T> sketches){
     if (sketches.size() == 0) {
       throw new IllegalArgumentException("Input sketches cannot be empty.");
     }
@@ -40,10 +40,10 @@ public interface SketchCombiner<T extends IntersectionSketch<T>> extends Seriali
   }
 
   /**
-   * @see #intersectionCardinality(Collection)
+   * @see #intersection(Collection)
    */
-  default long intersectionCardinality(T... sketches) {
-    return intersectionCardinality(Arrays.asList(sketches));
+  default long intersection(T... sketches) {
+    return intersection(Arrays.asList(sketches));
   }
 
   /**
