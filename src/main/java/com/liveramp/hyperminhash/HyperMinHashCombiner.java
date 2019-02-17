@@ -36,11 +36,6 @@ public class HyperMinHashCombiner implements SketchCombiner<HyperMinHash> {
   }
 
   @Override
-  public long intersectionCardinality(Collection<HyperMinHash> sketches) {
-    return (long) (union(sketches).cardinality() * similarity(sketches));
-  }
-
-  @Override
   public double similarity(Collection<HyperMinHash> sketches) {
     // TODO this similarity estimation does not take into account expected collisions
     // because it is too slow in practice, and the approximation algorithm presented

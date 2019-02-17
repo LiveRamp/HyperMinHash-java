@@ -42,15 +42,6 @@ public class BetaMinHashCombiner implements SketchCombiner<BetaMinHash> {
   }
 
   @Override
-  public long intersectionCardinality(Collection<BetaMinHash> sketches) {
-    if (sketches.size() == 0) {
-      throw new IllegalArgumentException("Input sketches cannot be empty.");
-    }
-
-    return (long) (similarity(sketches) * union(sketches).cardinality());
-  }
-
-  @Override
   public double similarity(Collection<BetaMinHash> sketches) {
     // Algorithm 4 in HyperMinHash paper
     if (sketches.size() == 0) {
