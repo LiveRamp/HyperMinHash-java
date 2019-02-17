@@ -122,10 +122,10 @@ public class HyperMinHash implements IntersectionSketch<HyperMinHash> {
   @Override
   public String toString() {
     return "HyperMinHash{" +
-        ", p=" + p +
+        " p=" + p +
         ", numZeroSearchBits=" + numZeroSearchBits +
         ", r=" + r +
-        "registers=" + registers.toString() +
+        ",registers=" + registers.toString() +
         '}';
   }
 }
