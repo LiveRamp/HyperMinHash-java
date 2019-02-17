@@ -28,7 +28,16 @@ Both implementations are equipped with serialization/deserialization
 capabilities out of the box for sending sketches over the wire or
 persisting them to disk.
 
-## Demo Usage
+## Usage
+
+### Importing via Maven
+```xml
+<dependency>
+  <groupId>com.liveramp</groupId>
+  <artifactId>hyperminhash</artifactId>
+  <version>0.2</version>
+</dependency>
+```
 
 ### Cardinality estimation
 ```
