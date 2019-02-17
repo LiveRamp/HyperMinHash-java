@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import static com.liveramp.hyperminhash.BetaMinHash.NUM_REGISTERS;
 
 public class BetaMinHashSerde implements IntersectionSketch.SerDe<BetaMinHash> {
+  private static final BetaMinHashSerde instance = new BetaMinHashSerde();
 
   /*
     Format:
@@ -13,6 +14,13 @@ public class BetaMinHashSerde implements IntersectionSketch.SerDe<BetaMinHash> {
       version (byte)
       registers (NUM_REGISTERS * short)
    */
+
+  public static BetaMinHashSerde getInstance(){
+    return instance;
+  }
+
+  private BetaMinHashSerde(){}
+
   @Override
   public BetaMinHash fromBytes(byte[] bytes) {
     short[] registers = new short[BetaMinHash.NUM_REGISTERS];

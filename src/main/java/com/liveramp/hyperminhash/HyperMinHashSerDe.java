@@ -21,6 +21,15 @@ public class HyperMinHashSerDe implements IntersectionSketch.SerDe<HyperMinHash>
           was being modified which made debugging harder. So I'm going with if statements
           for now.
    */
+
+  private static final HyperMinHashSerDe instance = new HyperMinHashSerDe();
+
+  public static HyperMinHashSerDe getInstance(){
+    return instance;
+  }
+
+  private HyperMinHashSerDe(){}
+
   @Override
   public HyperMinHash fromBytes(byte[] bytes) {
     ByteBuffer inputBuffer = ByteBuffer.wrap(bytes);
