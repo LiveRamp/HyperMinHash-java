@@ -40,7 +40,7 @@ persisting them to disk.
 ```
 
 ### Cardinality estimation
-```
+```java
 Set<byte[]> mySet = getMySet();
 BetaMinHash sketch = new BetaMinHash();
 for (byte[] element : mySet){
@@ -52,7 +52,7 @@ long estimatedCardinality = sketch.cardinality();
 
 
 ### Merging (unioning) sketches
-```
+```java
 Collection<BetaMinHash> sketches = getSketches();
 SketchCombiner<BetaMinHash> combiner = BetaMinHashCombiner.getInstance();
 BetaMinHash combined = combiner.union(sketches);
@@ -67,13 +67,13 @@ HyperMinHash combined = combiner.union(sketches);
 ```
 
 ### Cardinality of unions
-```
+```java
 BetaMinHash combined = combiner.union(sketches);
 long estimatedCardinality = combined.cardinality();
 ```
 
 ### Cardinality of intersection
-```
+```java
 Collection<BetaMinHash> sketches = getSketches();
 SketchCombiner<BetaMinHash> combiner = BetaMinHashComber.getInstance();
 long intersectionCardinality = combiner.intersectionCardinality(sketches);
@@ -81,7 +81,7 @@ long intersectionCardinality = combiner.intersectionCardinality(sketches);
 
 ### Serializing a sketch
 To get a byte[] representation of a sketch, use the `IntersectionSketch.SerDe` interface:
-```
+```java
 HyperMinHash sketch = getSketch();
 HyperMinHashSerde serde = new HyperMinHashSerde();
 
