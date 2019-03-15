@@ -14,13 +14,13 @@ addition of the bias correction seen in HyperLogLog++.
 2) **BetaMinHash**: An implementation which uses [LogLog-Beta](http://cse.seu.edu.cn/PersonalPage/csqjxiao/csqjxiao_files/papers/INFOCOM17.pdf)
 for the underlying LogLog implementation. Loglog-beta is almost identical in
 accuracy to HyperLogLog++, except it performs better on cardinality
-estimations for small datasets (n <= 200k). Since we use Loglog-Beta,
+estimations for small datasets (n <= 80k), holding memory fixed. Since we use Loglog-Beta,
 we refer to our implementation as BetaMinHash. However, our implementation
 currently only supports a fixed precision `p=14`.
 
-If you expect to be dealing with low cardinality datasets (<= 200,000 unique elements),
+If you expect to be dealing with low cardinality datasets (<= 80,000 unique elements),
 we recommend using BetaMinHash as it has a smaller memory footprint and is more accurate 
-than HyperLogLog in the range from 0-200,000, holding memory fixed. However, note that 
+than HyperLogLog in the range from 20,000-80,000, holding memory fixed. However, note that 
 different sketch types are not interchangeable i.e: obtaining the intersection of an 
 HMH and a BMH is not currently supported. 
 
