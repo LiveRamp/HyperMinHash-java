@@ -11,7 +11,7 @@ as HyperLogLog.
 This repo implements two flavors of HyperMinHash:
 1) **HyperMinHash**: An implementation based on HyperLogLog with the
 addition of the bias correction seen in HyperLogLog++.
-2) **BetaMinHash**: An implementation which uses [LogLog-Beta](http://cse.seu.edu.cn/PersonalPage/csqjxiao/csqjxiao_files/papers/INFOCOM17.pdf)
+2) **BetaMinHash**: An implementation which uses [LogLog-Beta](https://arxiv.org/abs/1612.02284)
 for the underlying LogLog implementation. Loglog-beta is almost identical in
 accuracy to HyperLogLog++, except it performs better on cardinality
 estimations for small datasets (n <= 80k), holding memory fixed. Since we use Loglog-Beta,
