@@ -10,7 +10,7 @@ class BitHelper {
    */
   static long getLeftmostBits(long value, int numBits) {
     if (numBits >= Long.SIZE) {
-      throw new IllegalArgumentException(String.format("numBits must be < %d", Integer.SIZE));
+      throw new IllegalArgumentException(String.format("numBits must be < %d", Long.SIZE));
     }
 
     return (value >>> (Long.SIZE - numBits));
