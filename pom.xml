@@ -202,24 +202,6 @@
         </plugins>
       </build>
     </profile>
-
-    <!-- To be used in any internal Jenkins builds which want to to push artifacts to the LR external
-    artifactory instead of use any versions on Sonatype -->
-    <profile>
-      <id>deploy-liveramp</id>
-      <distributionManagement>
-        <snapshotRepository>
-          <id>repository.liveramp.com</id>
-          <name>repository.liveramp.com-snapshots</name>
-          <url>http://repository.liveramp.com/artifactory/libs-snapshot-local</url>
-        </snapshotRepository>
-        <repository>
-          <id>repository.liveramp.com</id>
-          <name>repository.liveramp.com-releases</name>
-          <url>http://repository.liveramp.com/artifactory/libs-release-local</url>
-        </repository>
-      </distributionManagement>
-    </profile>
   </profiles>
 
   <dependencies>
