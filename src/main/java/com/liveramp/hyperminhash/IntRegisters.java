@@ -84,7 +84,7 @@ class IntRegisters implements Registers<IntRegisters> {
 
   @Override
   public String toString() {
-    return "LongRegisters{" +
+    return "IntRegisters{" +
         "registers=" + Arrays.toString(registers) +
         ", p=" + p +
         ", r=" + r +
