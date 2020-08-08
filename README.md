@@ -50,7 +50,6 @@ for (byte[] element : mySet){
 long estimatedCardinality = sketch.cardinality();
 ```
 
-
 ### Merging (unioning) sketches
 ```java
 Collection<BetaMinHash> sketches = getSketches();

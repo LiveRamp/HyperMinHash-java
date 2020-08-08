@@ -21,5 +21,4 @@ public class TestHmhCardinalityEstimator {
     Assert.assertEquals(expectedOutput, actualEstimate, 0.0001);
   }
 
-
 }

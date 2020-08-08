@@ -1,6 +1,5 @@
 package com.liveramp.hyperminhash;
 
-
 public class HyperMinHash implements IntersectionSketch<HyperMinHash> {
 
   // used in serialization

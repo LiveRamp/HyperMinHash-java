@@ -50,7 +50,6 @@ public class BetaMinHash implements IntersectionSketch<BetaMinHash> {
     this.registers = registers;
   }
 
-
   static BetaMinHash deepCopyFromRegisters(short[] registers) {
     if (registers.length != NUM_REGISTERS) {
       throw new IllegalArgumentException(String.format(

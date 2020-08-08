@@ -101,7 +101,6 @@ public class DemoBetaMinHash {
     return sum;
   }
 
-
   /**
    * The sum of sketch sizes can't be larger than Long.MAX_VALUE
    */
