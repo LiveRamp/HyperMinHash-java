@@ -41,7 +41,6 @@ public interface IntersectionSketch<T extends IntersectionSketch<T>> {
      */
     T fromBytes(byte[] bytes);
 
-
     /**
      * @param sketch the sketch to be serialized
      * @return serialized representation of the input sketch
@@ -57,4 +56,3 @@ public interface IntersectionSketch<T extends IntersectionSketch<T>> {
     int sizeInBytes(T sketch);
   }
 }
-

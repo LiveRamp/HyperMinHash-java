@@ -2,7 +2,6 @@ package com.liveramp.hyperminhash;
 
 import java.nio.ByteBuffer;
 
-
 public class HyperMinHashSerDe implements IntersectionSketch.SerDe<HyperMinHash> {
 
   /*

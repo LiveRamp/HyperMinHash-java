@@ -405,7 +405,6 @@ class HmhCardinalityEstimator implements Serializable {
           1296858.568, 1303455.691,}
   };
 
-
   private static final double[][] biasData = {
       // precision 4
       {10, 9.717, 9.207, 8.7896, 8.2882, 7.8204, 7.3772, 6.9342, 6.5202, 6.161, 5.7722, 5.4636,
@@ -1022,7 +1021,6 @@ class HmhCardinalityEstimator implements Serializable {
         })
         .value(estimate);
   }
-
 
   private static double alpha(int p) {
     // From the HLL paper

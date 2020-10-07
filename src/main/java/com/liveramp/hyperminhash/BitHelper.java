@@ -113,5 +113,4 @@ class BitHelper {
     return output;
   }
 
-
 }
