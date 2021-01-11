@@ -29,8 +29,15 @@ public class BetaMinHashSerde implements IntersectionSketch.SerDe<BetaMinHash> {
           "Sketch version is " + version + ". Only version 1 is supported.");
     }
 
-    for (int i = 0; i < NUM_REGISTERS; i++) {
-      registers[i] = inputBuffer.getShort();
+    for (int i = 0; i < NUM_REGISTERS;) {
+      short value = inputBuffer.getShort();
+      if (value < 0) {
+        i -= value;
+      }
+      else {
+        registers[i] = value;
+        i++;
+      }
     }
 
     return BetaMinHash.wrapRegisters(registers);
@@ -41,16 +48,39 @@ public class BetaMinHashSerde implements IntersectionSketch.SerDe<BetaMinHash> {
     ByteBuffer byteBuffer = ByteBuffer.allocate(sizeInBytes(sketch));
     byteBuffer.put(SerializationTokens.getTokenForClass(BetaMinHash.class).get());
     byteBuffer.put(BetaMinHash.VERSION);
-    for (short s : sketch.registers) {
-      byteBuffer.putShort(s);
+    for (short i = 0; i < sketch.registers.length;) {
+      if (sketch.registers[i] == 0) {
+        short zeros = 0;
+        while (i < sketch.registers.length && sketch.registers[i] == 0) {
+          zeros++;
+          i++;
+        }
+        byteBuffer.putShort((short) -zeros);
+      }
+      else {
+        byteBuffer.putShort(sketch.registers[i]);
+        i++;
+      }
     }
     return byteBuffer.array();
   }
 
   @Override
   public int sizeInBytes(BetaMinHash sketch) {
+    int numBytes = 0;
+    for (short i = 0; i < sketch.registers.length;) {
+      if (sketch.registers[i] == 0) {
+        while (i < sketch.registers.length && sketch.registers[i] == 0) {
+          i++;
+        }
+      }
+      else {
+        i++;
+      }
+      numBytes += Short.BYTES;
+    }
     return Byte.BYTES + // serde token
         Byte.BYTES + // version
-        NUM_REGISTERS * Short.BYTES; // size of registers
+        numBytes; // size of registers
   }
 }

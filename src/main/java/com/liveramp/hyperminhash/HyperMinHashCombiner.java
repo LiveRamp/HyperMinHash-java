@@ -1,6 +1,7 @@
 package com.liveramp.hyperminhash;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 public class HyperMinHashCombiner implements SketchCombiner<HyperMinHash> {
 
@@ -17,17 +18,14 @@ public class HyperMinHashCombiner implements SketchCombiner<HyperMinHash> {
   public HyperMinHash union(Collection<HyperMinHash> sketches) {
     assertInputNotEmpty(sketches);
     assertParamsAreEqual(sketches);
-    final HyperMinHash firstSketch = sketches.stream().findFirst().get();
-    if (sketches.size() == 1) {
-      return firstSketch.deepCopy();
-    }
+    Iterator<HyperMinHash> iter = sketches.iterator();
 
-    final int numRegisters = firstSketch.registers.getNumRegisters();
-    final HyperMinHash mergedSketch = firstSketch.deepCopy();
+    final HyperMinHash mergedSketch = iter.next().deepCopy();
+    final int numRegisters = mergedSketch.registers.getNumRegisters();
 
-    for (int i = 0; i < numRegisters; i++) {
-      for (HyperMinHash sketch : sketches) {
-
+    while (iter.hasNext()) {
+      final HyperMinHash sketch = iter.next();
+      for (int i = 0; i < numRegisters; i++) {
         mergedSketch.registers.updateIfGreaterThan(i, sketch.registers.getRegisterAtIndex(i));
       }
     }

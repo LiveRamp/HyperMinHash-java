@@ -1,6 +1,7 @@
 package com.liveramp.hyperminhash;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 public class BetaMinHashCombiner implements SketchCombiner<BetaMinHash> {
 
@@ -16,21 +17,17 @@ public class BetaMinHashCombiner implements SketchCombiner<BetaMinHash> {
 
   @Override
   public final BetaMinHash union(Collection<BetaMinHash> sketches) {
-    if (sketches.isEmpty()) {
+    Iterator<BetaMinHash> iter = sketches.iterator();
+    if (!iter.hasNext()) {
       throw new IllegalArgumentException("Input sketches cannot be empty.");
     }
 
-    final BetaMinHash firstSketch = sketches.stream()
-        .findFirst()
-        .get();
-    if (sketches.size() == 1) {
-      return firstSketch.deepCopy();
-    }
+    final BetaMinHash mergedSketch = iter.next().deepCopy();
 
-    final int numRegisters = firstSketch.registers.length;
-    final BetaMinHash mergedSketch = firstSketch.deepCopy();
-    for (int i = 0; i < numRegisters; i++) {
-      for (BetaMinHash sketch : sketches) {
+    final int numRegisters = mergedSketch.registers.length;
+    while (iter.hasNext()) {
+      final BetaMinHash sketch = iter.next();
+      for (int i = 0; i < numRegisters; i++) {
         mergedSketch.registers[i] = max(
             mergedSketch.registers[i],
             sketch.registers[i]

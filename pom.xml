@@ -187,6 +187,14 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
             <version>3.0.0</version>
+            <!-- fix NullPointerException -->
+            <dependencies>
+              <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.8.1</version>
+              </dependency>
+            </dependencies>
             <executions>
               <execution>
                 <configuration>

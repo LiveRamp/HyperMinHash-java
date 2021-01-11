@@ -2,6 +2,8 @@ package com.liveramp.hyperminhash;
 
 import java.nio.ByteBuffer;
 
+import static com.liveramp.hyperminhash.BetaMinHash.NUM_REGISTERS;
+
 public class HyperMinHashSerDe implements IntersectionSketch.SerDe<HyperMinHash> {
 
   /*
@@ -47,14 +49,28 @@ public class HyperMinHashSerDe implements IntersectionSketch.SerDe<HyperMinHash>
 
     if (LongRegisters.class.equals(registersClass)) {
       long[] registerValues = new long[numRegisters];
-      for (int i = 0; i < numRegisters; i++) {
-        registerValues[i] = inputBuffer.getLong();
+      for (int i = 0; i < numRegisters;) {
+        long value = inputBuffer.getLong();
+        if (value < 0) {
+          i -= value;
+        }
+        else {
+          registerValues[i] = value;
+          i++;
+        }
       }
       registers = new LongRegisters(p, r, registerValues);
     } else if (IntRegisters.class.equals(registersClass)) {
       int[] registerValues = new int[numRegisters];
-      for (int i = 0; i < numRegisters; i++) {
-        registerValues[i] = inputBuffer.getInt();
+      for (int i = 0; i < numRegisters;) {
+        int value = inputBuffer.getInt();
+        if (value < 0) {
+          i -= value;
+        }
+        else {
+          registerValues[i] = value;
+          i++;
+        }
       }
       registers = new IntRegisters(p, r, registerValues);
     } else {
@@ -82,13 +98,35 @@ public class HyperMinHashSerDe implements IntersectionSketch.SerDe<HyperMinHash>
 
     if (LongRegisters.class.equals(registersClass)) {
       LongRegisters longRegisters = (LongRegisters) sketch.registers;
-      for (long register : longRegisters.registers) {
-        outputBuffer.putLong(register);
+      int numRegisters = sketch.registers.getNumRegisters();
+      for (int i = 0; i < numRegisters;) {
+        if (longRegisters.registers[i] == 0) {
+          int zeros = 0;
+          while (i < numRegisters && longRegisters.registers[i] == 0) {
+            zeros++;
+            i++;
+          }
+          outputBuffer.putLong(-zeros);
+        } else {
+          outputBuffer.putLong(longRegisters.registers[i]);
+          i++;
+        }
       }
     } else if (IntRegisters.class.equals(registersClass)) {
       IntRegisters intRegisters = (IntRegisters) sketch.registers;
-      for (int register : intRegisters.registers) {
-        outputBuffer.putInt(register);
+      int numRegisters = sketch.registers.getNumRegisters();
+      for (int i = 0; i < numRegisters;) {
+        if (intRegisters.registers[i] == 0) {
+          int zeros = 0;
+          while (i < numRegisters && intRegisters.registers[i] == 0) {
+            zeros++;
+            i++;
+          }
+          outputBuffer.putInt(-zeros);
+        } else {
+          outputBuffer.putInt(intRegisters.registers[i]);
+          i++;
+        }
       }
     } else {
       throw new IllegalArgumentException("Register type not supported: " + registersClass);
@@ -102,11 +140,25 @@ public class HyperMinHashSerDe implements IntersectionSketch.SerDe<HyperMinHash>
     Class registersClass = sketch.registers.getClass();
     int registerSizeInBytes;
     if (LongRegisters.class.equals(registersClass)) {
-      registerSizeInBytes = sketch.registers.getNumRegisters() * Long.BYTES;
+      registerSizeInBytes = Long.BYTES;
     } else if (IntRegisters.class.equals(registersClass)) {
-      registerSizeInBytes = sketch.registers.getNumRegisters() * Integer.BYTES;
+      registerSizeInBytes = Integer.BYTES;
     } else {
       throw new IllegalArgumentException("Register type not supported: " + registersClass);
+    }
+
+    int numBytes = 0;
+    int numRegisters = sketch.registers.getNumRegisters();
+    for (int i = 0; i < numRegisters;) {
+      if (sketch.registers.getRegisterAtIndex(i) == 0) {
+        while (i < numRegisters && sketch.registers.getRegisterAtIndex(i) == 0) {
+          i++;
+        }
+      }
+      else {
+        i++;
+      }
+      numBytes += registerSizeInBytes;
     }
 
     return Byte.BYTES + // serde token
@@ -115,6 +167,6 @@ public class HyperMinHashSerDe implements IntersectionSketch.SerDe<HyperMinHash>
         Integer.BYTES + // r
         Byte.BYTES + // register serde token
         Integer.BYTES + // num registers
-        registerSizeInBytes; // registers
+        numBytes; // registers
   }
 }

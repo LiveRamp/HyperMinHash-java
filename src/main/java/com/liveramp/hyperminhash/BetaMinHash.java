@@ -59,7 +59,7 @@ public class BetaMinHash implements IntersectionSketch<BetaMinHash> {
     }
 
     final short[] registersCopy = new short[NUM_REGISTERS];
-    System.arraycopy(registers, 0, registers, 0, NUM_REGISTERS);
+    System.arraycopy(registers, 0, registersCopy, 0, NUM_REGISTERS);
 
     return wrapRegisters(registersCopy);
   }
