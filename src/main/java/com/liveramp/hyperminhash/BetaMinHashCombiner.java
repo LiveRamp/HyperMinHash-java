@@ -60,15 +60,13 @@ public class BetaMinHashCombiner implements SketchCombiner<BetaMinHash> {
 
     long c = 0;
     long n = 0;
-    final BetaMinHash firstSketch = sketches.stream()
-        .findFirst()
-        .get();
-    for (int i = 0; i < firstSketch.registers.length; i++) {
-      if (firstSketch.registers[i] != 0) {
+    BetaMinHash[] sketchArray = sketches.toArray(new BetaMinHash[sketches.size()]);
+    for (int i = 0; i < sketchArray[0].registers.length; i++) {
+      if (sketchArray[0].registers[i] != 0) {
         boolean itemInIntersection = true;
-        for (BetaMinHash sketch : sketches) {
-          itemInIntersection =
-              itemInIntersection && firstSketch.registers[i] == sketch.registers[i];
+        for (int j = 1; j < sketchArray.length; j++) {
+          itemInIntersection = itemInIntersection
+                  && sketchArray[0].registers[i] == sketchArray[j].registers[i];
         }
 
         if (itemInIntersection) {

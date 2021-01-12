@@ -56,14 +56,14 @@ public class HyperMinHashCombiner implements SketchCombiner<HyperMinHash> {
 
     long c = 0;
     long n = 0;
-    final HyperMinHash firstSketch = sketches.stream().findFirst().get();
-    long numRegisters = firstSketch.registers.getNumRegisters();
+    HyperMinHash[] sketchArray = sketches.toArray(new HyperMinHash[sketches.size()]);
+    long numRegisters = sketchArray[0].registers.getNumRegisters();
     for (int i = 0; i < numRegisters; i++) {
-      if (firstSketch.registers.getRegisterAtIndex(i) != 0) {
+      if (sketchArray[0].registers.getRegisterAtIndex(i) != 0) {
         boolean itemInIntersection = true;
-        for (HyperMinHash sketch : sketches) {
+        for (int j = 1; j < sketchArray.length; j++) {
           itemInIntersection = itemInIntersection &&
-              firstSketch.registers.getMantissaAtRegister(i) == sketch.registers
+                  sketchArray[0].registers.getMantissaAtRegister(i) == sketchArray[j].registers
                   .getMantissaAtRegister(i);
         }
 
