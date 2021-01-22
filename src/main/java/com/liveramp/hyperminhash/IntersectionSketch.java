@@ -1,5 +1,7 @@
 package com.liveramp.hyperminhash;
 
+import java.nio.ByteBuffer;
+
 /**
  * Representation of a set that is able to estimate the cardinality of that set, and perform the
  * operations in {@link SketchCombiner}. Each implementation of this interface should have a corresponding
@@ -33,19 +35,39 @@ public interface IntersectionSketch<T extends IntersectionSketch<T>> {
    *
    * @param <T> Intersection Sketch Type
    */
-  interface SerDe<T extends IntersectionSketch<T>> {
+  abstract class SerDe<T extends IntersectionSketch<T>> {
 
     /**
      * @param bytes serialized representation of the sketch.
      * @return deserialized sketch
      */
-    T fromBytes(byte[] bytes);
+    public T fromBytes(byte[] bytes) {
+      ByteBuffer inputBuffer = ByteBuffer.wrap(bytes);
+      return readFrom(inputBuffer);
+    }
+
+    /**
+     * @param buffer buffer containing serialized representation of the sketch.
+     * @return deserialized sketch
+     */
+    abstract public T readFrom(ByteBuffer buffer);
 
     /**
      * @param sketch the sketch to be serialized
      * @return serialized representation of the input sketch
      */
-    byte[] toBytes(T sketch);
+    public byte[] toBytes(T sketch) {
+      ByteBuffer outputBuffer = ByteBuffer.allocate(sizeInBytes(sketch));
+      writeTo(sketch, outputBuffer);
+      return outputBuffer.array();
+    }
+
+    /**
+     * @param sketch the sketch to be serialized
+     * @param buffer the buffer to write to
+     * @return serialized representation of the input sketch
+     */
+    abstract public void writeTo(T sketch, ByteBuffer buffer);
 
     /**
      * Returns the size of the serialized form of this sketch
@@ -53,6 +75,6 @@ public interface IntersectionSketch<T extends IntersectionSketch<T>> {
      * @param sketch the sketch whose size in bytes we want
      * @return size in bytes
      */
-    int sizeInBytes(T sketch);
+    public abstract int sizeInBytes(T sketch);
   }
 }

@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 
 import static com.liveramp.hyperminhash.BetaMinHash.NUM_REGISTERS;
 
-public class BetaMinHashSerde implements IntersectionSketch.SerDe<BetaMinHash> {
+public class BetaMinHashSerde extends IntersectionSketch.SerDe<BetaMinHash> {
 
   /*
     Format:
@@ -14,9 +14,8 @@ public class BetaMinHashSerde implements IntersectionSketch.SerDe<BetaMinHash> {
       registers (NUM_REGISTERS * short)
    */
   @Override
-  public BetaMinHash fromBytes(byte[] bytes) {
+  public BetaMinHash readFrom(ByteBuffer inputBuffer) {
     short[] registers = new short[BetaMinHash.NUM_REGISTERS];
-    ByteBuffer inputBuffer = ByteBuffer.wrap(bytes);
 
     byte serdeToken = inputBuffer.get();
     if (!BetaMinHash.class.equals(SerializationTokens.getClassForToken(serdeToken).get())) {
@@ -44,8 +43,7 @@ public class BetaMinHashSerde implements IntersectionSketch.SerDe<BetaMinHash> {
   }
 
   @Override
-  public byte[] toBytes(BetaMinHash sketch) {
-    ByteBuffer byteBuffer = ByteBuffer.allocate(sizeInBytes(sketch));
+  public void writeTo(BetaMinHash sketch, ByteBuffer byteBuffer) {
     byteBuffer.put(SerializationTokens.getTokenForClass(BetaMinHash.class).get());
     byteBuffer.put(BetaMinHash.VERSION);
     for (short i = 0; i < sketch.registers.length;) {
@@ -62,7 +60,6 @@ public class BetaMinHashSerde implements IntersectionSketch.SerDe<BetaMinHash> {
         i++;
       }
     }
-    return byteBuffer.array();
   }
 
   @Override

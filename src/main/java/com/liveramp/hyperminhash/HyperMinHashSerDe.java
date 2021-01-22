@@ -2,9 +2,7 @@ package com.liveramp.hyperminhash;
 
 import java.nio.ByteBuffer;
 
-import static com.liveramp.hyperminhash.BetaMinHash.NUM_REGISTERS;
-
-public class HyperMinHashSerDe implements IntersectionSketch.SerDe<HyperMinHash> {
+public class HyperMinHashSerDe extends IntersectionSketch.SerDe<HyperMinHash> {
 
   /*
         Serialized format:
@@ -23,8 +21,7 @@ public class HyperMinHashSerDe implements IntersectionSketch.SerDe<HyperMinHash>
           for now.
    */
   @Override
-  public HyperMinHash fromBytes(byte[] bytes) {
-    ByteBuffer inputBuffer = ByteBuffer.wrap(bytes);
+  public HyperMinHash readFrom(ByteBuffer inputBuffer) {
     byte serdeToken = inputBuffer.get();
     if (!HyperMinHash.class.equals(SerializationTokens.getClassForToken(serdeToken).get())) {
       throw new IllegalArgumentException("Input bytes do not represent a HyperMinHash object!");
@@ -81,8 +78,7 @@ public class HyperMinHashSerDe implements IntersectionSketch.SerDe<HyperMinHash>
   }
 
   @Override
-  public byte[] toBytes(HyperMinHash sketch) {
-    ByteBuffer outputBuffer = ByteBuffer.allocate(sizeInBytes(sketch));
+  public void writeTo(HyperMinHash sketch, ByteBuffer outputBuffer) {
     outputBuffer.put(SerializationTokens.getTokenForClass(HyperMinHash.class).get());
     outputBuffer.put(HyperMinHash.VERSION);
     outputBuffer.putInt(sketch.p);
@@ -131,8 +127,6 @@ public class HyperMinHashSerDe implements IntersectionSketch.SerDe<HyperMinHash>
     } else {
       throw new IllegalArgumentException("Register type not supported: " + registersClass);
     }
-
-    return outputBuffer.array();
   }
 
   @Override
