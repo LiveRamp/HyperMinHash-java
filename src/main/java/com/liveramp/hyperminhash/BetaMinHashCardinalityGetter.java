@@ -9,7 +9,7 @@ class BetaMinHashCardinalityGetter {
     double zeros = saz.zeros;
     double mHat = (double) BetaMinHash.NUM_REGISTERS;
     double alpha = alpha(BetaMinHash.NUM_REGISTERS);
-    return (long) (alpha * mHat * (mHat - zeros) / (beta(zeros) + sum));
+    return Math.round(alpha * mHat * (mHat - zeros) / (beta(zeros) + sum));
   }
 
   private static SumAndZeros getRegisterSumAndZeros(BetaMinHash sketch) {
