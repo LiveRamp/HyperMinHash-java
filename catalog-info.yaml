@@ -1,0 +1,19 @@
+# BEGIN TERRAFORM MANAGED BLOCK
+"apiVersion": "backstage.io/v1alpha1"
+"kind": "Location"
+"metadata":
+  "annotations":
+    "github.com/project-slug": "LiveRamp/HyperMinHash-java"
+  "description": "Union, intersection, and set cardinality in loglog space"
+  "name": "HyperMinHash-java"
+  "tags":
+  - "cardinality"
+  - "cardinality-estimation"
+  - "hyperloglog"
+  - "hyperloglog-sketches"
+  - "java"
+  - "loglog"
+  - "loglog-beta"
+  - "minhash"
+"spec": {}
+# END TERRAFORM MANAGED BLOCK
